@@ -1,0 +1,105 @@
+*zettelkasten.txt*  zettelkasten.nvim
+
+Author:  Furkan Uzumcu
+
+INTRODUCTION                                                  *zettelkasten.nvim*
+
+`zettelkasten.nvim` is a plugin to make it eaiser to use Zettelkasten note taking
+system: https://zettelkasten.de/introduction/
+
+It is meant to provide the following features in a way that is consistent with
+Vim's own features:
+
+1. Note ID competion
+2. ID generation
+3. Jumpting to references
+4. Jumping to tags
+5. Listing tags
+
+All relevant options are set automatocally if they have not been set before.
+If they were set, these are the options that you can use to get the best
+experience: >
+
+    setlocal tagfunc=v:lua.zettelkasten.tagfunc
+    setlocal isfname+=-,:
+    setlocal iskeyword+=:,-
+    setlocal suffixesadd+=.md
+    setlocal keywordprg=:ZkHover
+    setlocal completefunc=v:lua.zettelkasten.completefunc
+
+COMMANDS                                                  *zettelkasten-commands*
+================================================================================
+
+Global ~
+
+ZkNew                                                                    *:ZkNew*
+
+    Creates a new buffer with a markdown file type. If {notes_path} option was
+    set with |zettelkasten-setup|, it'll change the working directory.
+
+
+ZkHover                                                                *:ZkHover*
+
+    Implements |keywordprg|. This command is set to |keywordprg| option if
+    |keywordprg| is not already set.
+
+LUA                                                            *zettelkasten-lua*
+================================================================================
+
+setup({opts})                                                *zettelkasten-setup*
+
+    Initialize the plugin.
+
+    Parameters: ~
+        {opts} (optional, table)
+            - {notes_path} (optional, string): Defaults to an empty string. If
+              provided, |:ZkNew| uses the notes path to set the working
+              directory. If this is not set. you need to make sure that your
+              working directory is your notes directory. Otherwise some
+              features may not work.
+
+keyword_expr({cword})                                 *zettelkasten-keyword-expr*
+
+    Returns a table that contains the context for the note with the given ID
+    {cword}.
+
+    Parameters: ~
+        {cword} (string): The word under the cursor. If a note with the given
+        ID cannot be found, returns an empty table.
+
+    Returns: ~
+        {table}
+
+tagfunc({pattern}, {flags}, {info})                        *zettelkasten-tagfunc*
+
+    Implements a |tagfunc|. This function is automatically set to the
+    |tagfunc| option by the plugin.
+
+    Returns: ~
+        {table}
+
+set_note_id({bufnr})                                  *zettelkasten-set-note-id*
+
+    Prepends a note ID to the first line of the current buffer. It expects to
+    find a markdown header in the first line.
+
+    Parameters: ~
+        {bufnr} (number): Current buffer, or another note buffer.
+
+completefunc({base})                                  *zettelkasten-completefunc*
+
+    Implements a |complete-function|. Given a {base} note ID or title, returns
+    a list of notes matching notes.
+
+    Parameters: ~
+        {base} (string): Note ID or title.
+
+ABOUT                                                        *zettelkasten-about*
+================================================================================
+
+Grab the latest version or report a bug on GitHub:
+
+https://github.com/Furkanzmc/zettelkasten.nvim
+
+vim:tw=80:colorcolumn=81:et:ft=help:norl:
+
