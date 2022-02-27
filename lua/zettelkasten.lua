@@ -148,6 +148,20 @@ function M.tagfunc(pattern, flags, info)
         })
     end
 
+    if not in_insert then
+        local all_references = get_all_ids()
+        for _, ref in ipairs(all_references) do
+            if string.find(ref.id, pattern, 1, true) then
+                table.insert(tags, {
+                    name = ref.id,
+                    filename = ref.file_name,
+                    cmd = "1",
+                    kind = "zettelkasten",
+                })
+            end
+        end
+    end
+
     return tags
 end
 
