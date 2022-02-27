@@ -8,7 +8,11 @@ end
 
 function M.notify(msg, level, opts)
     if level >= s_log_level then
-        vim.notify(msg, level, opts)
+        local tag = ""
+        if opts.tag then
+            tag = "[zettelkasten] "
+        end
+        vim.notify(tag .. msg, level, opts)
     end
 end
 

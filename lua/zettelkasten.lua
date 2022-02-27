@@ -45,7 +45,7 @@ local function get_all_ids(base)
     for _, word in ipairs(references) do
         local zk_id = string.match(word, s_zk_id_pattern)
         if zk_id == nil then
-            log.notify("Cannot find the ID.", log_levels.DEBUG, {})
+            log.notify("Cannot find the ID.", log_levels.DEBUG, { tag = true })
             return {}
         end
 
@@ -74,7 +74,7 @@ local function generate_note_id()
     local zk_id = vim.fn.strftime("%d-%m-%y-%T")
 
     if not is_id_unique(zk_id) then
-        log.notify("[zettelkasten] Duplicate note ID: " .. zk_id, log_levels.DEBUG)
+        log.notify("Duplicate note ID: " .. zk_id, log_levels.DEBUG, { tag = true })
         return ""
     end
 
@@ -116,7 +116,7 @@ function M.set_note_id(bufnr)
         api.nvim_buf_set_lines(bufnr, 0, 1, true, { "# " .. zk_id .. " " .. first_line })
         vim.cmd("file " .. zk_id .. ".md")
     else
-        log.notify("[zettelkasten] There's already a note with the same ID.", log_levels.ERROR)
+        log.notify("There's already a note with the same ID.", log_levels.ERROR, { tag = true })
     end
 end
 
