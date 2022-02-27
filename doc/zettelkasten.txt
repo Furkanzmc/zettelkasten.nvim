@@ -36,6 +36,11 @@ window. Note that when the preview window commands are used (e.g |CTRL-W }|),
 |preview-window| is used. If you want to customize the preview window, use
 `preview_command` when setting up the plugin and rely on |K| command.
 
+    include ~
+
+    |include| commands can be used to see the references as well. You can use
+    `[I` to display all the lines that contain the reference under the cursor.
+
 COMMANDS                                                  *zettelkasten-commands*
 ================================================================================
 

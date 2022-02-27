@@ -13,6 +13,8 @@ vim.opt_local.isfname:append("-")
 vim.opt_local.iskeyword:append(":")
 vim.opt_local.iskeyword:append("-")
 vim.opt_local.suffixesadd:append(".md")
+vim.opt_local.include = "[[\\s]]"
+vim.opt_local.define = "^# \\s*"
 
 if vim.opt_local.keywordprg:get() == "" then
     vim.opt_local.keywordprg = ":ZkHover"
