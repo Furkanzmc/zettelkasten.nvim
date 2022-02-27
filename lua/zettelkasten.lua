@@ -6,6 +6,11 @@ local config = require("zettelkasten.config")
 
 local s_zk_id_pattern = "%d+-%d+-%d+-%d+:%d+:%d+"
 local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+:[0-9]+:[0-9]+"
+if vim.fn.has('linux') == 0 then
+  -- The colon is an illegal character in file names on Windows & Mac.
+  local s_zk_id_pattern = "%d+-%d+-%d+--%d+-%d+-%d+"
+  local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+--[0-9]+-[0-9]+-[0-9]+"
+end
 
 local function get_all_tags(base)
     if base == nil or #base == 0 then
@@ -71,7 +76,11 @@ local function is_id_unique(zk_id)
 end
 
 local function generate_note_id()
-    local zk_id = vim.fn.strftime("%d-%m-%y-%T")
+    local format = "%d-%m-%y-%T"
+    if vim.fn.has('linux') == 0 then
+      format = "%d-%m-%y--%H-%M-%S"
+    end
+    local zk_id = vim.fn.strftime(format)
 
     if not is_id_unique(zk_id) then
         log.notify("[zettelkasten] Duplicate note ID: " .. zk_id, log_levels.DEBUG)
