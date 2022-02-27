@@ -32,7 +32,15 @@ local function get_all_tags(base)
         linenr = string.gsub(linenr, ":", "")
         local regex = vim.regex("#\\k.*")
         local tag_name = word:sub(regex:match_str(word))
-        table.insert(tags, { file_name = file_name, linenr = linenr, tag_name = tag_name })
+        tag_name = string.gsub(tag_name, "^:", "")
+        local names = vim.split(tag_name, " ")
+        if #names > 1 then
+            for _, tn in ipairs(names) do
+                table.insert(tags, { file_name = file_name, linenr = linenr, tag_name = tn })
+            end
+        else
+            table.insert(tags, { file_name = file_name, linenr = linenr, tag_name = tag_name })
+        end
     end
 
     return tags
@@ -131,6 +139,7 @@ end
 
 function M.tagfunc(pattern, flags, info)
     local in_insert = string.match(flags, "i") ~= nil
+    local pattern_provided = pattern ~= "\\<\\k\\k"
     local all_tags = {}
     if in_insert then
         all_tags = get_all_tags(nil)
@@ -140,18 +149,20 @@ function M.tagfunc(pattern, flags, info)
 
     local tags = {}
     for _, tag in ipairs(all_tags) do
-        table.insert(tags, {
-            name = tag.tag_name,
-            filename = tag.file_name,
-            cmd = tag.linenr,
-            kind = "zettelkasten",
-        })
+        if string.find(tag.tag_name, pattern, 1, true) or not pattern_provided then
+            table.insert(tags, {
+                name = tag.tag_name,
+                filename = tag.file_name,
+                cmd = tag.linenr,
+                kind = "zettelkasten",
+            })
+        end
     end
 
     if not in_insert then
         local all_references = get_all_ids()
         for _, ref in ipairs(all_references) do
-            if string.find(ref.id, pattern, 1, true) then
+            if string.find(ref.id, pattern, 1, true) or not pattern_provided then
                 table.insert(tags, {
                     name = ref.id,
                     filename = ref.file_name,
@@ -162,7 +173,11 @@ function M.tagfunc(pattern, flags, info)
         end
     end
 
-    return tags
+    if #tags > 0 then
+        return tags
+    end
+
+    return nil
 end
 
 function M.keyword_expr(word, opts)
