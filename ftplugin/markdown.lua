@@ -13,11 +13,22 @@ vim.opt_local.isfname:append("-")
 vim.opt_local.iskeyword:append(":")
 vim.opt_local.iskeyword:append("-")
 vim.opt_local.suffixesadd:append(".md")
+vim.opt_local.errorformat = "%f:%l: %m"
 vim.opt_local.include = "[[\\s]]"
 vim.opt_local.define = "^# \\s*"
 
 if vim.opt_local.keywordprg:get() == "" then
     vim.opt_local.keywordprg = ":ZkHover"
+end
+
+if vim.fn.mapcheck("[I", "n") == "" then
+    vim.api.nvim_buf_set_keymap(
+        0,
+        "n",
+        "[I",
+        '<CMD>lua require("zettelkasten").show_references(vim.fn.expand("<cword>"))<CR>',
+        { noremap = true, silent = true, nowait = true }
+    )
 end
 
 vim.api.nvim_buf_add_user_command(0, "ZkHover", function(opts)

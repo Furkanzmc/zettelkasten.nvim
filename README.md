@@ -45,7 +45,7 @@ See `:help zettelkasten.txt` for more information.
 Potential ideas to implement in the future:
 
 - [ ] A graph view (Possible with an external CLI program.)
-- [ ] A sidebar (or preview window) to display the linked notes.
+- [X] A sidebar (or preview window) to display the linked notes.
 - [ ] Telescope support.
 
 # Project Goals

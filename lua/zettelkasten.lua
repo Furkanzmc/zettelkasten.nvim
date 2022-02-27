@@ -8,6 +8,17 @@ local s_zk_id_pattern = "%d+-%d+-%d+-%d+:%d+:%d+"
 local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+:[0-9]+:[0-9]+"
 local s_zk_file_name_pattern = "%d+-%d+-%d+-%d+:%d+:%d+.md"
 
+local function set_qflist(lines, action, bufnr, use_loclist, what)
+    what = what or {}
+    local _, local_efm = pcall(vim.api.nvim_buf_get_option, bufnr, "errorformat")
+    what.efm = what.efm or local_efm
+    if use_loclist then
+        vim.fn.setloclist(bufnr, lines, action, what)
+    else
+        vim.fn.setqflist(lines, action, what)
+    end
+end
+
 local function get_note_content(file_name)
     if vim.fn.filereadable(file_name) == 0 then
         log.notify("Cannot find the note.", log_levels.ERROR, { tag = true })
@@ -74,6 +85,16 @@ local function get_all_ids(base)
     end
 
     return words
+end
+
+local function get_context(all_ids, note_id)
+    for _, ref in ipairs(all_ids) do
+        if ref.id == note_id then
+            return ref.context
+        end
+    end
+
+    return ""
 end
 
 local function is_id_unique(zk_id)
@@ -204,6 +225,63 @@ function M.keyword_expr(word, opts)
     end
 
     return lines
+end
+
+function M.get_references(note_id)
+    local references = vim.fn.systemlist(
+        'rg -F "'
+            .. "[["
+            .. note_id
+            .. "]]"
+            .. '" --color never --no-heading --line-number --glob !'
+            .. note_id
+    )
+
+    local all_ids = get_all_ids()
+    local words = {}
+    for _, word in ipairs(references) do
+        local zk_id = string.match(word, s_zk_id_pattern)
+        if zk_id == nil then
+            log.notify("Cannot find the ID.", log_levels.DEBUG, { tag = true })
+            return {}
+        end
+
+        local file_name = string.match(word, s_zk_file_name_pattern)
+        local linenr = string.match(word, ":(%d+):", #file_name)
+        linenr = string.gsub(linenr, ":", "")
+        table.insert(words, {
+            id = zk_id,
+            linenr = linenr,
+            context = get_context(all_ids, zk_id),
+            file_name = file_name,
+        })
+    end
+
+    return words
+end
+
+function M.show_references(cword, use_loclist)
+    use_loclist = use_loclist or false
+    local references = M.get_references(cword)
+    local lines = {}
+    for _, ref in ipairs(references) do
+        local line = {}
+        table.insert(line, ref.file_name)
+        table.insert(line, ":")
+        table.insert(line, ref.linenr)
+        table.insert(line, ": ")
+        table.insert(line, ref.context)
+
+        table.insert(lines, table.concat(line, ""))
+    end
+
+    set_qflist(
+        {},
+        " ",
+        vim.api.nvim_get_current_buf(),
+        use_loclist,
+        { title = "[[" .. cword .. "]] References", lines = lines }
+    )
 end
 
 function M.setup(opts)

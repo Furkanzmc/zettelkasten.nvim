@@ -41,6 +41,15 @@ window. Note that when the preview window commands are used (e.g |CTRL-W }|),
     |include| commands can be used to see the references as well. You can use
     `[I` to display all the lines that contain the reference under the cursor.
 
+MAPS                                                          *zettelkasten-maps*
+================================================================================
+
+Global ~
+
+                                                                *zettelkasten-[I*
+[I      Lists the notes that reference the note ID under the cursor.
+
+
 COMMANDS                                                  *zettelkasten-commands*
 ================================================================================
 
@@ -131,6 +140,24 @@ completefunc({base})                                  *zettelkasten-completefunc
 
     Parameters: ~
         {base} (string): Note ID or title.
+
+show_references({cword}, {use_loclist})            *zettelkasten-show_references*
+
+    Presents the list of notes that reference the note with {cword} ID.
+    If {use_loclist} set to true, location list will be used instead of
+    quickfix list.
+
+get_references({note_id})                           *zettelkasten-get_references*
+
+    Returns a list containg an item each describing a note that references
+    {note_id}.
+
+    Each item in the return table contains these values:
+
+        - {id} (string): The note ID that references {note_id}
+        - {linenr} (number): The line where the reference is found.
+        - {context} (string): The title of the note with {id}
+        - {file_name} (string): The file name of the note with {id}
 
 ABOUT                                                        *zettelkasten-about*
 ================================================================================
