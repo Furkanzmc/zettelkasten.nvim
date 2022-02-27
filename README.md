@@ -46,7 +46,8 @@ Potential ideas to implement in the future:
 
 - [ ] A graph view (Possible with an external CLI program.)
 - [X] A sidebar (or preview window) to display the linked notes.
-- [ ] Telescope support.
+- [ ] Telescope support. It's a popular plugin so it'd be useful but I don't use Telescope so
+  contributions for this feature is most welcome!
 
 # Project Goals
 
