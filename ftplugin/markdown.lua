@@ -14,13 +14,28 @@ vim.opt_local.iskeyword:append(":")
 vim.opt_local.iskeyword:append("-")
 vim.opt_local.suffixesadd:append(".md")
 
-vim.api.nvim_buf_add_user_command(0, "ZkHover", function(_)
-    local lines = zk.keyword_expr(vim.fn.expand("<cword>"))
-    vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, {})
-end, {
-    nargs = 1,
-})
-
 if vim.opt_local.keywordprg:get() == "" then
     vim.opt_local.keywordprg = ":ZkHover"
 end
+
+vim.api.nvim_buf_add_user_command(0, "ZkHover", function(opts)
+    local args = {}
+    if opts.args ~= nil then
+        args = vim.split(opts.args, " ", true)
+    end
+
+    local cword = ""
+    if #args == 1 then
+        cword = vim.fn.expand("<cword>")
+    else
+        cword = args[#args]
+    end
+
+    local lines = zk.keyword_expr(cword, {
+        preview_note = vim.tbl_contains(args, "-preview"),
+        return_lines = vim.tbl_contains(args, "-return-lines"),
+    })
+    vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, {})
+end, {
+    nargs = "+",
+})

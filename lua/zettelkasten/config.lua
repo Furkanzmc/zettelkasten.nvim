@@ -1,5 +1,5 @@
 local M = {}
-local s_config = { notes_path = "" }
+local s_config = { notes_path = "", preview_command = "pedit" }
 
 M.get = function()
     return s_config

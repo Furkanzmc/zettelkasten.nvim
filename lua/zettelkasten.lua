@@ -6,6 +6,14 @@ local config = require("zettelkasten.config")
 
 local s_zk_id_pattern = "%d+-%d+-%d+-%d+:%d+:%d+"
 local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+:[0-9]+:[0-9]+"
+local s_zk_file_name_pattern = "%d+-%d+-%d+-%d+:%d+:%d+.md"
+
+local function get_note_content(file_name)
+    if vim.fn.filereadable(file_name) == 0 then
+        log.notify("Cannot find the note.", log_levels.ERROR, { tag = true })
+    end
+    return vim.fn.readfile(file_name, "")
+end
 
 local function get_all_tags(base)
     if base == nil or #base == 0 then
@@ -49,10 +57,11 @@ local function get_all_ids(base)
             return {}
         end
 
+        local file_name = string.match(word, s_zk_file_name_pattern)
         local context = string.match(word, "# " .. s_zk_id_pattern .. " .*")
         context = string.gsub(context, " " .. s_zk_id_pattern, "")
         if word ~= base then
-            table.insert(words, { id = zk_id, context = context })
+            table.insert(words, { id = zk_id, context = context, file_name = file_name })
         end
     end
 
@@ -142,16 +151,26 @@ function M.tagfunc(pattern, flags, info)
     return tags
 end
 
-function M.keyword_expr(word)
+function M.keyword_expr(word, opts)
     if not word then
         return {}
     end
+
+    opts = opts or {}
+    opts.preview_note = opts.preview_note or false
+    opts.return_lines = opts.return_lines or false
 
     local matching_ids = get_all_ids()
     local lines = {}
     for _, entry in ipairs(matching_ids) do
         if entry.id == word then
-            table.insert(lines, entry.context)
+            if opts.preview_note and not opts.return_lines then
+                vim.cmd(config.get().preview_command .. " " .. entry.file_name)
+            elseif opts.preview_note and opts.return_lines then
+                vim.list_extend(lines, get_note_content(entry.file_name))
+            else
+                table.insert(lines, entry.context)
+            end
         end
     end
 

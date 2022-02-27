@@ -27,6 +27,15 @@ experience: >
     setlocal keywordprg=:ZkHover
     setlocal completefunc=v:lua.zettelkasten.completefunc
 
+PREVIEWING NOTES                                     *zettelkasten-preview-notes*
+================================================================================
+
+To review a note, you can either use |K| mapping to execute |keywordprg| or
+use any of the preview window tag mappings to open the note in a preview
+window. Note that when the preview window commands are used (e.g |CTRL-W }|),
+|preview-window| is used. If you want to customize the preview window, use
+`preview_command` when setting up the plugin and rely on |K| command.
+
 COMMANDS                                                  *zettelkasten-commands*
 ================================================================================
 
@@ -38,10 +47,21 @@ ZkNew                                                                    *:ZkNew
     set with |zettelkasten-setup|, it'll change the working directory.
 
 
-ZkHover                                                                *:ZkHover*
+ZkHover {-preview} {-return-lines} {note_id}                           *:ZkHover*
 
     Implements |keywordprg|. This command is set to |keywordprg| option if
     |keywordprg| is not already set.
+
+    If `-preview` is passed to the command, a preview window will be used to
+    show the note contents.
+
+    If `-return-lines` can only be used when `-preview` is used. When this
+    argument is passed, this command will return the note content in a list
+    instead of using `preview_command`.
+
+    Example: >
+        setlocal keywordprg=:ZkHover\ -preview
+        setlocal keywordprg=:ZkHover\ -preview\ -return-lines
 
 LUA                                                            *zettelkasten-lua*
 ================================================================================
@@ -57,8 +77,14 @@ setup({opts})                                                *zettelkasten-setup
               directory. If this is not set. you need to make sure that your
               working directory is your notes directory. Otherwise some
               features may not work.
+            - {preview_command} (optional, string): The command to use to
+              preview a note. This will be used with |:ZkHover -preview|
+              command. The command must take one string argument as the name
+              of the note file. This can be used to configure
+              zettelkasten.nvim so the hover previews are (for example) shown
+              in a hover window.
 
-keyword_expr({cword})                                 *zettelkasten-keyword-expr*
+keyword_expr({cword}, {opts})                         *zettelkasten-keyword-expr*
 
     Returns a table that contains the context for the note with the given ID
     {cword}.
@@ -66,6 +92,13 @@ keyword_expr({cword})                                 *zettelkasten-keyword-expr
     Parameters: ~
         {cword} (string): The word under the cursor. If a note with the given
         ID cannot be found, returns an empty table.
+        {opts} (optional, table)
+            - {preview_note} (optional, boolean): If set to true,
+              `preview_command` will be used to preview the note.
+            - {return_lines} (optional, boolean): Only used when
+              `preview_note` is set to `true`. When set, instead of using
+              `preview_command`, it returns the note contents from the
+              command.
 
     Returns: ~
         {table}
