@@ -36,6 +36,10 @@ Install using your favorite plugin manager. There's no required dependencies.
 
 See `:help zettelkasten.txt` for more information.
 
+# Dependencies
+
+- [ripgrep](https://github.com/BurntSushi/ripgrep/)
+
 # TODO
 
 Potential ideas to implement in the future:
