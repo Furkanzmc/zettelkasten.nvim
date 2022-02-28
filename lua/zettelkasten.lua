@@ -5,9 +5,9 @@ local log = require("zettelkasten.log")
 local config = require("zettelkasten.config")
 local formatter = require("zettelkasten.formatter")
 
-local s_zk_id_pattern = "%d+-%d+-%d+-%d+:%d+:%d+"
-local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+:[0-9]+:[0-9]+"
-local s_zk_file_name_pattern = "%d+-%d+-%d+-%d+:%d+:%d+.md"
+local s_zk_id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+"
+local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+"
+local s_zk_file_name_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md"
 
 local function set_qflist(lines, action, bufnr, use_loclist, what)
     what = what or {}
@@ -133,7 +133,7 @@ local function is_id_unique(zk_id)
 end
 
 local function generate_note_id()
-    local zk_id = vim.fn.strftime("%d-%m-%y-%T")
+    local zk_id = vim.fn.strftime("%y-%m-%d-%H-%M-%S")
 
     if not is_id_unique(zk_id) then
         log.notify("Duplicate note ID: " .. zk_id, log_levels.DEBUG, { tag = true })
