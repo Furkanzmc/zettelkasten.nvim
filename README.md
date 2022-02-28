@@ -30,7 +30,7 @@ Click the image for a demo.
 
 # Installation
 
-Install using your favorite plugin manager. There's no required dependencies.
+Install using your favorite plugin manager.
 
 # Configuration
 
