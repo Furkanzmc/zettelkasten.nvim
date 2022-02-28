@@ -1,5 +1,9 @@
 local M = {}
-local s_config = { notes_path = "", preview_command = "pedit" }
+local s_config = {
+    notes_path = "",
+    preview_command = "pedit",
+    browseformat = "%f - %h [%r Refs] %t",
+}
 
 M.get = function()
     return s_config

@@ -13,6 +13,10 @@ api.nvim_add_user_command("ZkNew", function(_)
     vim.cmd("normal $")
 end, {})
 
+api.nvim_add_user_command("ZkBrowse", function(_)
+    vim.cmd("edit zk://browser")
+end, {})
+
 _G.zettelkasten = {
     tagfunc = require("zettelkasten").tagfunc,
     completefunc = require("zettelkasten").completefunc,

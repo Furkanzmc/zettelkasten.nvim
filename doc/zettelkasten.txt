@@ -18,7 +18,7 @@ Vim's own features:
 
 All relevant options are set automatocally if they have not been set before.
 If they were set, these are the options that you can use to get the best
-experience: >
+experience. These options may change, make sure the check the filetype file: >
 
     setlocal tagfunc=v:lua.zettelkasten.tagfunc
     setlocal isfname+=-,:
@@ -44,10 +44,11 @@ window. Note that when the preview window commands are used (e.g |CTRL-W }|),
 MAPS                                                          *zettelkasten-maps*
 ================================================================================
 
-Global ~
+Buffer Local ~
 
                                                                 *zettelkasten-[I*
-[I      Lists the notes that reference the note ID under the cursor.
+[I      Lists the notes that reference the note ID under the cursor. Available
+        in markdown buffers and plugin specific buffers.
 
 
 COMMANDS                                                  *zettelkasten-commands*
@@ -77,6 +78,12 @@ ZkHover {-preview} {-return-lines} {note_id}                           *:ZkHover
         setlocal keywordprg=:ZkHover\ -preview
         setlocal keywordprg=:ZkHover\ -preview\ -return-lines
 
+ZkBrowse                                                              *:ZkBrowse*
+
+    Just a command that runs `edit zk://browser`.
+    In this buffer, you can use the same short cuts that you use to navigate
+    and open notes as in the markdown files.
+
 LUA                                                            *zettelkasten-lua*
 ================================================================================
 
@@ -97,6 +104,14 @@ setup({opts})                                                *zettelkasten-setup
               of the note file. This can be used to configure
               zettelkasten.nvim so the hover previews are (for example) shown
               in a hover window.
+            - {browseformat} (optional, string): Used to format each line when
+              browsing the notes. Here's the supported values:
+                  field     meaning ~
+                  %f        File name of the note.
+                  %h        Note's header.
+                  %r        Number of references to this note.
+                  %t        Tags in the note.
+              Default value is: `%f - %h [%r Refs] %t`
 
 keyword_expr({cword}, {opts})                         *zettelkasten-keyword-expr*
 

@@ -3,6 +3,7 @@ local api = vim.api
 local log_levels = vim.log.levels
 local log = require("zettelkasten.log")
 local config = require("zettelkasten.config")
+local formatter = require("zettelkasten.formatter")
 
 local s_zk_id_pattern = "%d+-%d+-%d+-%d+:%d+:%d+"
 local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+:[0-9]+:[0-9]+"
@@ -26,20 +27,38 @@ local function get_note_content(file_name)
     return vim.fn.readfile(file_name, "")
 end
 
-local function get_all_tags(base)
-    if base == nil or #base == 0 then
-        base = "\\w.*"
+local function get_all_tags(lookup_tag, search_file)
+    search_file = search_file or ""
+    if lookup_tag == nil or #lookup_tag == 0 or lookup_tag == "*" then
+        lookup_tag = "\\w.*"
     end
 
-    local references = vim.fn.systemlist(
-        'rg "(#' .. base .. ')" --color never --no-heading --line-number'
-    )
+    local cmd = {
+        "rg",
+        "'(#" .. lookup_tag .. ")'",
+        "--color never",
+        "--no-heading",
+        "--line-number",
+    }
+    if #search_file > 0 then
+        table.insert(cmd, search_file)
+    end
+
+    local references = vim.fn.systemlist(table.concat(cmd, " "))
     local tags = {}
 
     for _, word in ipairs(references) do
-        local file_name = string.match(word, ".*%a:")
-        file_name = string.gsub(file_name, ":$", "")
-        local linenr = string.match(word, ":(%d+):")
+        local linenr_pattern = ":(%d+):"
+        local file_name = ""
+        if #search_file > 0 then
+            file_name = search_file
+            linenr_pattern = "(%d+):"
+        else
+            file_name = string.match(word, ".*%a:")
+            file_name = string.gsub(file_name, ":$", "")
+        end
+
+        local linenr = string.match(word, linenr_pattern)
         linenr = string.gsub(linenr, ":", "")
         local regex = vim.regex("#\\k.*")
         local tag_name = word:sub(regex:match_str(word))
@@ -70,7 +89,7 @@ local function get_all_ids(base)
     end
 
     local references = vim.fn.systemlist(
-        'rg "# ' .. search_str .. '" --color never --no-heading --no-line-number'
+        'rg "# ' .. search_str .. '" --sort path --no-heading --no-line-number'
     )
 
     local words = {}
@@ -165,7 +184,8 @@ end
 
 function M.tagfunc(pattern, flags, info)
     local in_insert = string.match(flags, "i") ~= nil
-    local pattern_provided = pattern ~= "\\<\\k\\k"
+    local regex = vim.regex(pattern)
+    local pattern_provided = pattern ~= "\\<\\k\\k" or pattern == "*"
     local all_tags = {}
     if in_insert then
         all_tags = get_all_tags(nil)
@@ -238,7 +258,7 @@ function M.get_references(note_id)
             .. "[["
             .. note_id
             .. "]]"
-            .. '" --color never --no-heading --line-number --glob !'
+            .. '" --sort path --no-heading --line-number --glob !'
             .. note_id
     )
 
@@ -287,6 +307,45 @@ function M.show_references(cword, use_loclist)
         use_loclist,
         { title = "[[" .. cword .. "]] References", lines = lines }
     )
+end
+
+function M.get_note_browser_content()
+    local all_ids = get_all_ids()
+    local lines = {}
+    for _, note in ipairs(all_ids) do
+        table.insert(lines, {
+            file_name = note.file_name,
+            references = M.get_references(note.id),
+            tags = get_all_tags("*", note.file_name),
+            title = note.context,
+        })
+    end
+
+    return formatter.format(lines, config.get().browseformat)
+end
+
+function M.add_hover_command()
+    vim.api.nvim_buf_add_user_command(0, "ZkHover", function(opts)
+        local args = {}
+        if opts.args ~= nil then
+            args = vim.split(opts.args, " ", true)
+        end
+
+        local cword = ""
+        if #args == 1 then
+            cword = vim.fn.expand("<cword>")
+        else
+            cword = args[#args]
+        end
+
+        local lines = M.keyword_expr(cword, {
+            preview_note = vim.tbl_contains(args, "-preview"),
+            return_lines = vim.tbl_contains(args, "-return-lines"),
+        })
+        vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, {})
+    end, {
+        nargs = "+",
+    })
 end
 
 function M.setup(opts)
