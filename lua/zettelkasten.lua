@@ -58,14 +58,19 @@ local function get_all_tags(base)
 end
 
 local function get_all_ids(base)
+    local search_str = ""
     if base and #base > 0 then
-        base = s_zk_id_regexp .. " " .. base
+        if #base >= 1 and tonumber(string.sub(base, 1, 2)) ~= nil then
+            search_str = base
+        else
+            search_str = s_zk_id_regexp .. " " .. base
+        end
     else
-        base = s_zk_id_regexp
+        search_str = s_zk_id_regexp
     end
 
     local references = vim.fn.systemlist(
-        'rg "# ' .. base .. '" --color never --no-heading --no-line-number'
+        'rg "# ' .. search_str .. '" --color never --no-heading --no-line-number'
     )
 
     local words = {}
@@ -128,8 +133,8 @@ function M.completefunc(find_start, base)
     end
 
     local all_references = get_all_ids(base)
-
     local words = {}
+
     for _, ref in ipairs(all_references) do
         if ref.word ~= base then
             table.insert(words, {
