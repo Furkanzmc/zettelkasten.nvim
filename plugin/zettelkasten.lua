@@ -15,6 +15,10 @@ end, {})
 
 api.nvim_add_user_command("ZkBrowse", function(_)
     vim.cmd("edit zk://browser")
+    local config = s_config.get()
+    if config.notes_path ~= "" then
+        vim.cmd("lcd " .. config.notes_path)
+    end
 end, {})
 
 _G.zettelkasten = {
