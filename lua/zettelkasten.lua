@@ -133,7 +133,7 @@ local function is_id_unique(zk_id)
 end
 
 local function generate_note_id()
-    local zk_id = vim.fn.strftime("%y-%m-%d-%H-%M-%S")
+    local zk_id = vim.fn.strftime("%Y-%m-%d-%H-%M-%S")
 
     if not is_id_unique(zk_id) then
         log.notify("Duplicate note ID: " .. zk_id, log_levels.DEBUG, { tag = true })
