@@ -12,7 +12,7 @@ vim.opt_local.suffixesadd:append(".md")
 vim.opt_local.errorformat = "%f:%l: %m"
 
 if vim.opt_local.keywordprg:get() == "" then
-    vim.opt_local.keywordprg = ":ZkHover"
+    vim.opt_local.keywordprg = ":ZkHover -preview"
 end
 
 if vim.opt_local.tagfunc:get() == "" then
