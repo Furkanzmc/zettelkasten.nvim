@@ -324,8 +324,8 @@ function M.get_note_browser_content()
     return formatter.format(lines, config.get().browseformat)
 end
 
-function M.add_hover_command()
-    vim.api.nvim_buf_add_user_command(0, "ZkHover", function(opts)
+function M.add_hover_command(bufnr)
+    vim.api.nvim_buf_add_user_command(bufnr, "ZkHover", function(opts)
         local args = {}
         if opts.args ~= nil then
             args = vim.split(opts.args, " ", true)

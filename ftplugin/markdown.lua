@@ -31,4 +31,4 @@ if vim.fn.mapcheck("[I", "n") == "" then
     )
 end
 
-require("zettelkasten").add_hover_command()
+require("zettelkasten").add_hover_command(0)

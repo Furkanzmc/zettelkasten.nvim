@@ -19,7 +19,7 @@ if vim.opt_local.tagfunc:get() == "" then
     vim.opt_local.tagfunc = "v:lua.zettelkasten.tagfunc"
 end
 
-require("zettelkasten").add_hover_command()
+require("zettelkasten").add_hover_command(0)
 
 if vim.fn.mapcheck("[I", "n") == "" then
     vim.api.nvim_buf_set_keymap(
