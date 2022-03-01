@@ -24,7 +24,7 @@ functionality to make it easier to take notes.
 
 For the most up to date information, please do `:help zettelkasten.txt`. I won't be updating README
 file for every single feature or update. You can also check out the
-(wiki)[https://github.com/Furkanzmc/zettelkasten.nvim/wiki] for tips and tricks on how to use
+[wiki](https://github.com/Furkanzmc/zettelkasten.nvim/wiki) for tips and tricks on how to use
 zettelkasten.nvim.
 
 # Demo
