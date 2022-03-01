@@ -22,6 +22,9 @@ Using this plugin, you can:
 There's no separate file type for zettelkasten. Markdown file type is used to extend the
 functionality to make it easier to take notes.
 
+For the most up to date information, please do `:help zettelkasten.txt`. I won't be updating README
+file for every single feature or update.
+
 # Demo
 
 Click the image for a demo.
@@ -72,3 +75,4 @@ needs. So, all the Lua API will be nicely designed so you can interface this plu
 
 - [zk-nvim](https://github.com/mickael-menu/zk-nvim)
 - [zettel.vim](https://github.com/Aarleks/zettel.vim/)
+- [telekasten.nvim](https://github.com/renerocksai/telekasten.nvim)
