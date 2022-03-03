@@ -73,6 +73,8 @@ In true Vim philosophy, I also want to make it easier for people to extend this 
 needs. So, all the Lua API will be nicely designed so you can interface this plugin with others
 (e.g `Telescope.nvim`) or create your own workflow easily.
 
+Please also see `:help zettelkasten.nvim-101` and `:help zettelkasten-philosophy`.
+
 # Related Projects
 
 - [zk-nvim](https://github.com/mickael-menu/zk-nvim)

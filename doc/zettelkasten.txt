@@ -3,22 +3,20 @@
 Author:  Furkan Uzumcu
 
 INTRODUCTION                                                  *zettelkasten.nvim*
+================================================================================
 
-`zettelkasten.nvim` is a plugin to make it eaiser to use Zettelkasten note taking
-system: https://zettelkasten.de/introduction/
+`zettelkasten.nvim` is a plugin to make it eaiser to use Zettelkasten note
+taking system: https://zettelkasten.de/introduction/
 
 It is meant to provide the following features in a way that is consistent with
 Vim's own features:
 
-1. Note ID competion
-2. ID generation
-3. Jumpting to references
-4. Jumping to tags
-5. Listing tags
+1. Note ID competion 2. ID generation 3. Jumpting to references 4. Jumping to
+tags 5. Listing tags
 
 All relevant options are set automatocally if they have not been set before.
 If they were set, these are the options that you can use to get the best
-experience. These options may change, make sure the check the filetype file: >
+experience. These options may change, make sure the check the file type file: >
 
     setlocal tagfunc=v:lua.zettelkasten.tagfunc
     setlocal isfname+=-,:
@@ -26,6 +24,36 @@ experience. These options may change, make sure the check the filetype file: >
     setlocal suffixesadd+=.md
     setlocal keywordprg=:ZkHover
     setlocal completefunc=v:lua.zettelkasten.completefunc
+
+ZETTELKASTEN.NVIM 101                                     *zettelkasten.nvim-101*
+================================================================================
+
+The plugin does not introduce any new syntax for note taking. You can take
+advantage of the markdown syntax with headers, tags, and links. You can refer
+to a note by wrapping the note ID (i.e The file name.) with double angle
+brackets.
+
+>
+    This note refers to [[2022-02-27-06-05-03]] which was created using
+    :ZkNew.
+    It can also refer to an [[existing_note]]. With this approach, you won't
+    be able to use `:help CTRL-]` to jump to the file buy you can still use
+    `:help gf`
+
+`zettelkasten.nvim` also assumes a single folder where all the notes reside.
+If you need to organize things you can use `#tags` to group them or create a
+note that will be used as a reference for other notes.
+
+PHILOSOPHY                                              *zettelkasten-philosophy*
+================================================================================
+
+`zettelkasten.nvim` embraces Vim by trying its hardest to not create new
+commands or mappings. Everything this plugin provides should ideally be
+useable with existing Vim options, mappings, and commands.
+
+Where possible, Lua API should be exposed to others can extend this plugin's
+functionality or create their own plugins on top of this one (e.g telescope
+pickers.).
 
 PREVIEWING NOTES                                     *zettelkasten-preview-notes*
 ================================================================================
