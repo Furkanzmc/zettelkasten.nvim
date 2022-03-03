@@ -78,6 +78,16 @@ Buffer Local ~
 [I      Lists the notes that reference the note ID under the cursor. Available
         in markdown buffers and plugin specific buffers.
 
+VIM OPTIONS                                            *zettelkasten-vim-options*
+================================================================================
+
+Buffer Local ~
+
+'grepprg'
+
+This option is first read from the local option and if it doesn't exist, the
+global option is used. Currently, `grep` and `rg` commands are supported.
+Becuase of issue #9, it's hard to support 'grepprg' in a generic way.
 
 COMMANDS                                                  *zettelkasten-commands*
 ================================================================================

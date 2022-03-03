@@ -9,15 +9,81 @@ local s_zk_id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+"
 local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+"
 local s_zk_file_name_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md"
 
-local function run_grep(args)
+local function get_grepprg()
+    local grepprg = vim.opt_local.grepprg:get()
+    if #grepprg == 0 then
+        grepprg = vim.opt.grepprg:get()
+    end
+
+    local cmd = vim.split(grepprg, " ")
+
+    -- We want to control what parameters are passed in.
+    if #cmd > 1 then
+        grepprg = cmd[1]
+    end
+
+    return grepprg
+end
+
+local function get_rg_cmd(search_pattern, search_file)
+    local cmd = {
+        "rg",
+        search_pattern,
+        "--line-number",
+        "--color",
+        "never",
+        "--no-heading",
+        "--sort",
+        "path",
+    }
+
+    if search_file then
+        table.insert(cmd, search_file)
+    end
+
+    return cmd
+end
+
+local function get_grep_cmd(search_pattern, search_file)
+    local grepprg = get_grepprg()
+    if grepprg == "rg" then
+        return get_rg_cmd(search_pattern, search_file)
+    end
+
+    local cmd = {
+        grepprg,
+        "-E",
+        search_pattern,
+        "--line-number",
+        "-I",
+        "--exclude-dir",
+        ".git",
+    }
+
+    if search_file then
+        table.insert(cmd, search_file)
+    else
+        table.insert(cmd, "-R")
+    end
+
+    return cmd
+end
+
+local function run_grep(search_pattern, search_file, extra_args)
+    local args = get_grep_cmd(search_pattern, search_file)
+    if extra_args then
+        for _, arg in pairs(extra_args) do
+            table.insert(args, arg)
+        end
+    end
     local output = {}
     local job_id = vim.fn.jobstart(args, {
         cwd = config.get().notes_path,
         on_exit = function() end,
         clear_env = true,
-        -- FIXME: If this is not set, rg never returns any output.
-        pty = true,
         stdout_buffered = true,
+        -- FIXME: See issue #9
+        pty = args[1] ~= "grep",
         on_stdout = function(job_id, data)
             output = vim.tbl_filter(function(item)
                 return item ~= ""
@@ -56,19 +122,7 @@ local function get_all_tags(lookup_tag, search_file)
         lookup_tag = "\\w.*"
     end
 
-    local cmd = {
-        "rg",
-        "(#" .. lookup_tag .. ")",
-        "--color",
-        "never",
-        "--no-heading",
-        "--line-number",
-    }
-    if #search_file > 0 then
-        table.insert(cmd, search_file)
-    end
-
-    local references = run_grep(cmd)
+    local references = run_grep("(#" .. lookup_tag .. ")", search_file)
     local tags = {}
 
     for _, word in ipairs(references) do
@@ -112,16 +166,7 @@ local function get_all_ids(base)
         search_str = s_zk_id_regexp
     end
 
-    local references = run_grep({
-        "rg",
-        "# " .. search_str,
-        "--sort",
-        "path",
-        "--color",
-        "never",
-        "--no-heading",
-        "--no-line-number",
-    })
+    local references = run_grep("# " .. search_str)
 
     local words = {}
     for _, word in ipairs(references) do
@@ -283,19 +328,7 @@ function M.keyword_expr(word, opts)
 end
 
 function M.get_references(note_id, all_ids)
-    local references = run_grep({
-        "rg",
-        "-F",
-        "[[" .. note_id .. "]]",
-        "--sort",
-        "path",
-        "--no-heading",
-        "--line-number",
-        "--color",
-        "never",
-        "--glob",
-        "!" .. note_id,
-    })
+    local references = run_grep("[[" .. note_id .. "]]", nil, { "-F" })
 
     local words = {}
     for _, word in ipairs(references) do
