@@ -9,6 +9,29 @@ local s_zk_id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+"
 local s_zk_id_regexp = "[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+-[0-9]+"
 local s_zk_file_name_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md"
 
+local function run_grep(args)
+    local output = {}
+    local job_id = vim.fn.jobstart(args, {
+        cwd = config.get().notes_path,
+        on_exit = function() end,
+        clear_env = true,
+        -- FIXME: If this is not set, rg never returns any output.
+        pty = true,
+        stdout_buffered = true,
+        on_stdout = function(job_id, data)
+            output = vim.tbl_filter(function(item)
+                return item ~= ""
+            end, data)
+            output = vim.tbl_map(function(item)
+                return string.gsub(item, "\r", "")
+            end, output)
+        end,
+    })
+    vim.fn.jobwait({ job_id }, 5000)
+
+    return output
+end
+
 local function set_qflist(lines, action, bufnr, use_loclist, what)
     what = what or {}
     local _, local_efm = pcall(vim.api.nvim_buf_get_option, bufnr, "errorformat")
@@ -35,8 +58,9 @@ local function get_all_tags(lookup_tag, search_file)
 
     local cmd = {
         "rg",
-        "'(#" .. lookup_tag .. ")'",
-        "--color never",
+        "(#" .. lookup_tag .. ")",
+        "--color",
+        "never",
         "--no-heading",
         "--line-number",
     }
@@ -44,7 +68,7 @@ local function get_all_tags(lookup_tag, search_file)
         table.insert(cmd, search_file)
     end
 
-    local references = vim.fn.systemlist(table.concat(cmd, " "))
+    local references = run_grep(cmd)
     local tags = {}
 
     for _, word in ipairs(references) do
@@ -88,23 +112,29 @@ local function get_all_ids(base)
         search_str = s_zk_id_regexp
     end
 
-    local references = vim.fn.systemlist(
-        'rg "# ' .. search_str .. '" --sort path --no-heading --no-line-number'
-    )
+    local references = run_grep({
+        "rg",
+        "# " .. search_str,
+        "--sort",
+        "path",
+        "--color",
+        "never",
+        "--no-heading",
+        "--no-line-number",
+    })
 
     local words = {}
     for _, word in ipairs(references) do
         local zk_id = string.match(word, s_zk_id_pattern)
         if zk_id == nil then
             log.notify("Cannot find the ID.", log_levels.DEBUG, { tag = true })
-            return {}
-        end
-
-        local file_name = string.match(word, s_zk_file_name_pattern)
-        local context = string.match(word, "# " .. s_zk_id_pattern .. " .*")
-        context = string.gsub(context, " " .. s_zk_id_pattern, "")
-        if word ~= base then
-            table.insert(words, { id = zk_id, context = context, file_name = file_name })
+        else
+            local file_name = string.match(word, s_zk_file_name_pattern)
+            local context = string.match(word, "# " .. s_zk_id_pattern .. " .*")
+            context = string.gsub(context, " " .. s_zk_id_pattern, "")
+            if word ~= base then
+                table.insert(words, { id = zk_id, context = context, file_name = file_name })
+            end
         end
     end
 
@@ -252,17 +282,21 @@ function M.keyword_expr(word, opts)
     return lines
 end
 
-function M.get_references(note_id)
-    local references = vim.fn.systemlist(
-        'rg -F "'
-            .. "[["
-            .. note_id
-            .. "]]"
-            .. '" --sort path --no-heading --line-number --glob !'
-            .. note_id
-    )
+function M.get_references(note_id, all_ids)
+    local references = run_grep({
+        "rg",
+        "-F",
+        "[[" .. note_id .. "]]",
+        "--sort",
+        "path",
+        "--no-heading",
+        "--line-number",
+        "--color",
+        "never",
+        "--glob",
+        "!" .. note_id,
+    })
 
-    local all_ids = get_all_ids()
     local words = {}
     for _, word in ipairs(references) do
         local zk_id = string.match(word, s_zk_id_pattern)
@@ -287,7 +321,8 @@ end
 
 function M.show_references(cword, use_loclist)
     use_loclist = use_loclist or false
-    local references = M.get_references(cword)
+    local all_ids = get_all_ids()
+    local references = M.get_references(cword, all_ids)
     local lines = {}
     for _, ref in ipairs(references) do
         local line = {}
@@ -315,7 +350,7 @@ function M.get_note_browser_content()
     for _, note in ipairs(all_ids) do
         table.insert(lines, {
             file_name = note.file_name,
-            references = M.get_references(note.id),
+            references = M.get_references(note.id, all_ids),
             tags = get_all_tags("*", note.file_name),
             title = note.context,
         })
