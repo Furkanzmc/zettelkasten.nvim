@@ -196,26 +196,8 @@ local function get_context(all_ids, note_id)
     return ""
 end
 
-local function is_id_unique(zk_id)
-    local all_ids = get_all_ids()
-    for _, entry in ipairs(all_ids) do
-        if entry.id == zk_id then
-            return false
-        end
-    end
-
-    return true
-end
-
 local function generate_note_id()
-    local zk_id = vim.fn.strftime("%Y-%m-%d-%H-%M-%S")
-
-    if not is_id_unique(zk_id) then
-        log.notify("Duplicate note ID: " .. zk_id, log_levels.DEBUG, { tag = true })
-        return ""
-    end
-
-    return zk_id
+    return vim.fn.strftime("%Y-%m-%d-%H-%M-%S")
 end
 
 function M.completefunc(find_start, base)
