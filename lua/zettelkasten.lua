@@ -37,7 +37,7 @@ local function get_rg_cmd(search_pattern, search_file)
         "path",
     }
 
-    if search_file then
+    if search_file and #search_file > 0 then
         table.insert(cmd, search_file)
     end
 
@@ -55,31 +55,37 @@ local function get_grep_cmd(search_pattern, search_file)
         "-E",
         search_pattern,
         "--line-number",
-        "-I",
-        "--exclude-dir",
-        ".git",
     }
 
-    if search_file then
+    if search_file and #search_file > 0 then
         table.insert(cmd, search_file)
     else
         table.insert(cmd, "-R")
     end
 
+    table.insert(cmd, "-I")
+    table.insert(cmd, "--exclude-dir")
+    table.insert(cmd, ".git")
+
     return cmd
 end
 
 local function run_grep(search_pattern, search_file, extra_args)
+    extra_args = extra_args or {}
     local args = get_grep_cmd(search_pattern, search_file)
     if extra_args then
         for _, arg in pairs(extra_args) do
             table.insert(args, arg)
         end
     end
+
     local output = {}
     local job_id = vim.fn.jobstart(args, {
-        cwd = config.get().notes_path,
-        on_exit = function() end,
+        on_exit = function(job_id, exit_code, _)
+            if exit_code ~= 0 then
+                output = {}
+            end
+        end,
         clear_env = true,
         stdout_buffered = true,
         -- FIXME: See issue #9
@@ -120,9 +126,12 @@ local function get_all_tags(lookup_tag, search_file)
     search_file = search_file or ""
     if lookup_tag == nil or #lookup_tag == 0 or lookup_tag == "*" then
         lookup_tag = "\\w.*"
+    else
+        lookup_tag = string.gsub(lookup_tag, "\\<", "")
+        lookup_tag = string.gsub(lookup_tag, "\\>", "")
     end
 
-    local references = run_grep("(#" .. lookup_tag .. ")", search_file)
+    local references = run_grep("#" .. lookup_tag, search_file)
     local tags = {}
 
     for _, word in ipairs(references) do
@@ -139,15 +148,20 @@ local function get_all_tags(lookup_tag, search_file)
         local linenr = string.match(word, linenr_pattern)
         linenr = string.gsub(linenr, ":", "")
         local regex = vim.regex("#\\k.*")
-        local tag_name = word:sub(regex:match_str(word))
-        tag_name = string.gsub(tag_name, "^:", "")
-        local names = vim.split(tag_name, " ")
-        if #names > 1 then
-            for _, tn in ipairs(names) do
-                table.insert(tags, { file_name = file_name, linenr = linenr, tag_name = tn })
+        local names = vim.split(word, " ")
+        for _, tn in ipairs(names) do
+            local match = regex:match_str(tn)
+            if match then
+                local tag_name = tn:sub(regex:match_str(tn))
+                if tag_name then
+                    tag_name = string.gsub(tag_name, "^:", "")
+                    table.insert(tags, {
+                        file_name = file_name,
+                        linenr = linenr,
+                        tag_name = tag_name,
+                    })
+                end
             end
-        else
-            table.insert(tags, { file_name = file_name, linenr = linenr, tag_name = tag_name })
         end
     end
 
@@ -241,25 +255,22 @@ end
 
 function M.tagfunc(pattern, flags, info)
     local in_insert = string.match(flags, "i") ~= nil
-    local regex = vim.regex(pattern)
     local pattern_provided = pattern ~= "\\<\\k\\k" or pattern == "*"
     local all_tags = {}
-    if in_insert then
-        all_tags = get_all_tags(nil)
-    else
+    if pattern_provided then
         all_tags = get_all_tags(pattern)
+    else
+        all_tags = get_all_tags(nil)
     end
 
     local tags = {}
     for _, tag in ipairs(all_tags) do
-        if string.find(tag.tag_name, pattern, 1, true) or not pattern_provided then
-            table.insert(tags, {
-                name = tag.tag_name,
-                filename = tag.file_name,
-                cmd = tag.linenr,
-                kind = "zettelkasten",
-            })
-        end
+        table.insert(tags, {
+            name = string.gsub(tag.tag_name, "#", ""),
+            filename = tag.file_name,
+            cmd = tag.linenr,
+            kind = "zettelkasten",
+        })
     end
 
     if not in_insert then
@@ -317,18 +328,25 @@ function M.get_references(note_id, all_ids)
         local zk_id = string.match(word, s_zk_id_pattern)
         if zk_id == nil then
             log.notify("Cannot find the ID.", log_levels.DEBUG, { tag = true })
-            return {}
+        else
+            local file_name = string.match(word, s_zk_file_name_pattern)
+            if file_name == nil then
+                log.notify(
+                    "Cannot capture the file name: " .. word,
+                    log_levels.DEBUG,
+                    { tag = true }
+                )
+            else
+                local linenr = string.match(word, ":(%d+):", #file_name)
+                linenr = string.gsub(linenr, ":", "")
+                table.insert(words, {
+                    id = zk_id,
+                    linenr = linenr,
+                    context = get_context(all_ids, zk_id),
+                    file_name = file_name,
+                })
+            end
         end
-
-        local file_name = string.match(word, s_zk_file_name_pattern)
-        local linenr = string.match(word, ":(%d+):", #file_name)
-        linenr = string.gsub(linenr, ":", "")
-        table.insert(words, {
-            id = zk_id,
-            linenr = linenr,
-            context = get_context(all_ids, zk_id),
-            file_name = file_name,
-        })
     end
 
     return words
