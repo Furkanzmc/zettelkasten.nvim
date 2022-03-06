@@ -80,3 +80,4 @@ Please also see `:help zettelkasten.nvim-101` and `:help zettelkasten-philosophy
 - [zk-nvim](https://github.com/mickael-menu/zk-nvim)
 - [zettel.vim](https://github.com/Aarleks/zettel.vim/)
 - [telekasten.nvim](https://github.com/renerocksai/telekasten.nvim)
+- [marty-oehme/zettelkasten.nvim](https://github.com/marty-oehme/zettelkasten.nvim)
