@@ -43,7 +43,7 @@ See `:help zettelkasten.txt` for more information.
 
 # Dependencies
 
-- [ripgrep](https://github.com/BurntSushi/ripgrep/)
+- [ripgrep](https://github.com/BurntSushi/ripgrep/) or good ol' `grep`. You can choose which one is used by modifying `:help grepprg`.
 
 # TODO
 
