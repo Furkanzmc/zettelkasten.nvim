@@ -12,7 +12,9 @@ local s_formatters = {
     ["%t"] = function(line)
         local tags = {}
         for _, tag in ipairs(line.tags) do
-            table.insert(tags, tag.tag_name)
+            if vim.tbl_contains(tags, tag.tag_name) == false then
+                table.insert(tags, tag.tag_name)
+            end
         end
 
         return table.concat(tags, " ")
