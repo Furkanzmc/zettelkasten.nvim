@@ -87,6 +87,7 @@ local function run_grep(search_pattern, search_file, extra_args)
                 output = {}
             end
         end,
+        cwd = config.get().notes_path,
         clear_env = true,
         stdout_buffered = true,
         -- FIXME: See issue #9
