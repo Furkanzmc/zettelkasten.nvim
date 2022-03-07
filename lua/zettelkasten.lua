@@ -54,15 +54,16 @@ local function get_grep_cmd(search_pattern, search_file)
         grepprg,
         "-E",
         search_pattern,
-        "--line-number",
     }
 
     if search_file and #search_file > 0 then
         table.insert(cmd, search_file)
     else
+        table.insert(cmd, "./")
         table.insert(cmd, "-R")
     end
 
+    table.insert(cmd, "--line-number")
     table.insert(cmd, "-I")
     table.insert(cmd, "--exclude-dir")
     table.insert(cmd, ".git")
