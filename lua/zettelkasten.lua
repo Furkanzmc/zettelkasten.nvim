@@ -377,6 +377,8 @@ function M.show_references(cword, use_loclist)
         use_loclist,
         { title = "[[" .. cword .. "]] References", lines = lines }
     )
+
+    vim.cmd([[botright copen | wincmd p]])
 end
 
 function M.get_note_browser_content()
