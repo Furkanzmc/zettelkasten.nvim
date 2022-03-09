@@ -8,8 +8,8 @@ if vim.opt_local.completefunc:get() == "" then
     vim.opt_local.completefunc = "v:lua.zettelkasten.completefunc"
 end
 
-vim.opt_local.isfname:append(":")
-vim.opt_local.isfname:append("-")
+vim.opt.isfname:append(":")
+vim.opt.isfname:append("-")
 vim.opt_local.iskeyword:append(":")
 vim.opt_local.iskeyword:append("-")
 vim.opt_local.suffixesadd:append(".md")
