@@ -149,6 +149,7 @@ setup({opts})                                                *zettelkasten-setup
                   %h        Note's header.
                   %r        Number of references to this note.
                   %t        Tags in the note.
+                  %d        Note ID.
               Default value is: `%f - %h [%r Refs] %t`
 
 keyword_expr({cword}, {opts})                         *zettelkasten-keyword-expr*
@@ -211,6 +212,44 @@ get_references({note_id})                           *zettelkasten-get_references
         - {linenr} (number): The line where the reference is found.
         - {context} (string): The title of the note with {id}
         - {file_name} (string): The file name of the note with {id}
+
+get_toc({note_id}, {format})                               *zettelkasten-get_toc*
+
+    Returns a table that contains a list of notes that refer to {note_id}
+    formatted according to {format}.
+
+    You can use this function to insert all the notes that refer to a master
+    note.
+
+    Parameters: ~
+        {note_id} (string): Note ID.
+        {format} (optional, string)
+            The default format is `- [%h](%d)`. Only these format options are
+            supported.
+
+            field     meaning ~
+            %f        File name of the note.
+            %h        Note's header.
+            %d        Note ID.
+
+    Returns: ~
+        {table}
+
+    Example: ~
+        Insert Table of Contents with a Command: >
+
+        vim.api.nvim_buf_add_user_command(0, "ZkInsertTOC", function(opts)
+            vim.api.nvim_buf_set_lines(
+                vim.api.nvim_get_current_buf(),
+                opts.line1,
+                opts.line2,
+                true,
+                require("zettelkasten").get_toc(opts.args)
+            )
+        end, {
+            nargs = 1,
+            range = true,
+        })
 
 ABOUT                                                        *zettelkasten-about*
 ================================================================================

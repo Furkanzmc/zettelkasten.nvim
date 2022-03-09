@@ -381,12 +381,29 @@ function M.show_references(cword, use_loclist)
     vim.cmd([[botright copen | wincmd p]])
 end
 
+function M.get_toc(note_id, format)
+    format = format or "- [%h](%d)"
+    local all_ids = get_all_ids()
+    local references = M.get_references(note_id, all_ids)
+    local lines = {}
+    for _, note in ipairs(references) do
+        table.insert(lines, {
+            file_name = note.file_name,
+            id = note.id,
+            title = note.context,
+        })
+    end
+
+    return formatter.format(lines, format)
+end
+
 function M.get_note_browser_content()
     local all_ids = get_all_ids()
     local lines = {}
     for _, note in ipairs(all_ids) do
         table.insert(lines, {
             file_name = note.file_name,
+            id = note.id,
             references = M.get_references(note.id, all_ids),
             tags = get_all_tags("*", note.file_name),
             title = note.context,

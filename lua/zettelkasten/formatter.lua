@@ -9,6 +9,9 @@ local s_formatters = {
     ["%h"] = function(line)
         return line.title
     end,
+    ["%d"] = function(line)
+        return line.id
+    end,
     ["%t"] = function(line)
         local tags = {}
         for _, tag in ipairs(line.tags) do
