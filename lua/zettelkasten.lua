@@ -413,28 +413,35 @@ function M.get_note_browser_content()
     return formatter.format(lines, config.get().browseformat)
 end
 
-function M.add_hover_command(bufnr)
-    vim.api.nvim_buf_add_user_command(bufnr, "ZkHover", function(opts)
-        local args = {}
-        if opts.args ~= nil then
-            args = vim.split(opts.args, " ", true)
-        end
+function M.add_hover_command()
+    if vim.fn.exists(":ZkHover") == 2 then
+        return
+    end
 
-        local cword = ""
-        if #args == 1 then
-            cword = vim.fn.expand("<cword>")
-        else
-            cword = args[#args]
-        end
+    vim.cmd(
+        [[command -buffer -nargs=? ZkHover :lua require"zettelkasten"._internal_execute_hover_cmd(<q-args>)]]
+    )
+end
 
-        local lines = M.keyword_expr(cword, {
-            preview_note = vim.tbl_contains(args, "-preview"),
-            return_lines = vim.tbl_contains(args, "-return-lines"),
-        })
-        vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, {})
-    end, {
-        nargs = "+",
+function M._internal_execute_hover_cmd(args)
+    if args ~= nil and type(args) == "string" then
+        args = vim.split(args, " ", true)
+    else
+        args = {}
+    end
+
+    local cword = ""
+    if #args == 1 then
+        cword = vim.fn.expand("<cword>")
+    else
+        cword = args[#args]
+    end
+
+    local lines = M.keyword_expr(cword, {
+        preview_note = vim.tbl_contains(args, "-preview"),
+        return_lines = vim.tbl_contains(args, "-return-lines"),
     })
+    vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, {})
 end
 
 function M.setup(opts)
