@@ -5,18 +5,21 @@ Author:  Furkan Uzumcu
 INTRODUCTION                                                  *zettelkasten.nvim*
 ================================================================================
 
-`zettelkasten.nvim` is a plugin to make it eaiser to use Zettelkasten note
+`zettelkasten.nvim` is a plugin to make it easier to use the Zettelkasten note
 taking system: https://zettelkasten.de/introduction/
 
 It is meant to provide the following features in a way that is consistent with
 Vim's own features:
 
-1. Note ID competion 2. ID generation 3. Jumpting to references 4. Jumping to
-tags 5. Listing tags
+1. Note ID completion
+2. ID generation
+3. Jumping to references
+4. Jumping to tags
+5. Listing tags
 
-All relevant options are set automatocally if they have not been set before.
+All relevant options are set automatically if they have not been set before.
 If they were set, these are the options that you can use to get the best
-experience. These options may change, make sure the check the file type file: >
+experience. These options may change, make sure the check the filetype file: >
 
     setlocal tagfunc=v:lua.zettelkasten.tagfunc
     setlocal isfname+=-,:
@@ -30,7 +33,7 @@ ZETTELKASTEN.NVIM 101                                     *zettelkasten.nvim-101
 
 The plugin does not introduce any new syntax for note taking. You can take
 advantage of the markdown syntax with headers, tags, and links. You can refer
-to a note by wrapping the note ID (i.e The file name.) with double angle
+to a note by wrapping the note ID (i.e. the file name) with double angle
 brackets.
 
 >
@@ -51,8 +54,8 @@ PHILOSOPHY                                              *zettelkasten-philosophy
 commands or mappings. Everything this plugin provides should ideally be
 useable with existing Vim options, mappings, and commands.
 
-Where possible, Lua API should be exposed to others can extend this plugin's
-functionality or create their own plugins on top of this one (e.g telescope
+Where possible, Lua API should be exposed so others can extend this plugin's
+functionality or create their own plugins on top of this one (e.g. telescope
 pickers.).
 
 PREVIEWING NOTES                                     *zettelkasten-preview-notes*
@@ -87,7 +90,7 @@ Buffer Local ~
 
 This option is first read from the local option and if it doesn't exist, the
 global option is used. Currently, `grep` and `rg` commands are supported.
-Becuase of issue #9, it's hard to support 'grepprg' in a generic way.
+Because of issue #9, it's hard to support 'grepprg' in a generic way.
 
 COMMANDS                                                  *zettelkasten-commands*
 ================================================================================
