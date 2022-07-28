@@ -26,7 +26,7 @@ if vim.fn.mapcheck("[I", "n") == "" then
         0,
         "n",
         "[I",
-        '<CMD>lua require("zettelkasten").show_references(vim.fn.expand("<cword>"))<CR>',
+        '<CMD>lua require("zettelkasten").show_back_references(vim.fn.expand("<cword>"))<CR>',
         { noremap = true, silent = true, nowait = true }
     )
 end

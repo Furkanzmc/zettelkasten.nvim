@@ -41,10 +41,6 @@ Install using your favorite plugin manager.
 
 See `:help zettelkasten.txt` for more information.
 
-# Dependencies
-
-- [ripgrep](https://github.com/BurntSushi/ripgrep/) or good ol' `grep`. You can choose which one is used by modifying `:help grepprg`.
-
 # TODO
 
 Potential ideas to implement in the future:

@@ -3,8 +3,11 @@ local s_formatters = {
     ["%r"] = function(line)
         return #line.references
     end,
+    ["%b"] = function(line)
+        return #line.back_references
+    end,
     ["%f"] = function(line)
-        return line.file_name
+        return vim.fn.fnamemodify(line.file_name, ":t")
     end,
     ["%h"] = function(line)
         return line.title
@@ -15,8 +18,8 @@ local s_formatters = {
     ["%t"] = function(line)
         local tags = {}
         for _, tag in ipairs(line.tags) do
-            if vim.tbl_contains(tags, tag.tag_name) == false then
-                table.insert(tags, tag.tag_name)
+            if vim.tbl_contains(tags, tag.name) == false then
+                table.insert(tags, tag.name)
             end
         end
 
