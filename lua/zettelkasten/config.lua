@@ -2,7 +2,7 @@ local M = {}
 local s_config = {
     notes_path = "",
     preview_command = "pedit",
-    browseformat = "%f - %h [%r Refs] %t",
+    browseformat = "%f - %h [%r Refs] [%b B-Refs] %t",
 }
 
 M.get = function()

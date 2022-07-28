@@ -81,17 +81,6 @@ Buffer Local ~
 [I      Lists the notes that reference the note ID under the cursor. Available
         in markdown buffers and plugin specific buffers.
 
-VIM OPTIONS                                            *zettelkasten-vim-options*
-================================================================================
-
-Buffer Local ~
-
-'grepprg'
-
-This option is first read from the local option and if it doesn't exist, the
-global option is used. Currently, `grep` and `rg` commands are supported.
-Because of issue #9, it's hard to support 'grepprg' in a generic way.
-
 COMMANDS                                                  *zettelkasten-commands*
 ================================================================================
 
@@ -150,10 +139,11 @@ setup({opts})                                                *zettelkasten-setup
                   field     meaning ~
                   %f        File name of the note.
                   %h        Note's header.
-                  %r        Number of references to this note.
+                  %b        Number of references to this note.
+                  %r        Number of notes this file references.
                   %t        Tags in the note.
                   %d        Note ID.
-              Default value is: `%f - %h [%r Refs] %t`
+              Default value is: `%f - %h [%r Refs] [%b B-Refs] %t`
 
 keyword_expr({cword}, {opts})                         *zettelkasten-keyword-expr*
 
@@ -198,13 +188,13 @@ completefunc({base})                                  *zettelkasten-completefunc
     Parameters: ~
         {base} (string): Note ID or title.
 
-show_references({cword}, {use_loclist})            *zettelkasten-show_references*
+show_back_references({cword}, {use_loclist})  *zettelkasten-show_back_references*
 
     Presents the list of notes that reference the note with {cword} ID.
     If {use_loclist} set to true, location list will be used instead of
     quickfix list.
 
-get_references({note_id})                           *zettelkasten-get_references*
+get_back_references({note_id})                 *zettelkasten-get_back_references*
 
     Returns a list containg an item each describing a note that references
     {note_id}.
@@ -213,7 +203,7 @@ get_references({note_id})                           *zettelkasten-get_references
 
         - {id} (string): The note ID that references {note_id}
         - {linenr} (number): The line where the reference is found.
-        - {context} (string): The title of the note with {id}
+        - {title} (string): The title of the note with {id}
         - {file_name} (string): The file name of the note with {id}
 
 get_toc({note_id}, {format})                               *zettelkasten-get_toc*
@@ -262,4 +252,3 @@ Grab the latest version or report a bug on GitHub:
 https://github.com/Furkanzmc/zettelkasten.nvim
 
 vim:tw=80:colorcolumn=81:et:ft=help:norl:
-
