@@ -1,5 +1,3 @@
-vim.api.nvim_buf_set_lines(0, 0, -1, true, require("zettelkasten").get_note_browser_content())
-
 vim.opt_local.cursorline = true
 vim.opt_local.modifiable = true
 vim.opt_local.buflisted = true
@@ -30,3 +28,10 @@ if vim.fn.mapcheck("[I", "n") == "" then
         { noremap = true, silent = true, nowait = true }
     )
 end
+
+local config = require("zettelkasten.config").get()
+if config.notes_path ~= "" then
+    vim.cmd("lcd " .. config.notes_path)
+end
+
+vim.api.nvim_buf_set_lines(0, 0, -1, true, require("zettelkasten").get_note_browser_content())

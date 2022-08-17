@@ -25,9 +25,5 @@ _G.zettelkasten = {
     end,
     zkbrowse = function()
         vim.cmd("edit zk://browser")
-        local config = s_config.get()
-        if config.notes_path ~= "" then
-            vim.cmd("lcd " .. config.notes_path)
-        end
-    end,
+    end
 }
