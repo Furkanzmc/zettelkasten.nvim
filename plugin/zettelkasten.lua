@@ -25,5 +25,5 @@ _G.zettelkasten = {
     end,
     zkbrowse = function()
         vim.cmd("edit zk://browser")
-    end
+    end,
 }

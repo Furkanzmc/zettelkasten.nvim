@@ -21,13 +21,15 @@ end
 
 local function extract_id_and_title(line)
     local zk_id = string.match(line, ZK_FULL_TITLE_PATTERN)
-    if zk_id == nil then return nil end
+    if zk_id == nil then
+        return nil
+    end
 
     zk_id = string.gsub(zk_id, "# ", "")
     local note_id = string.match(zk_id, ZK_ID_PATTERN)
     local title = vim.trim(string.gsub(zk_id, ZK_ID_PATTERN, ""))
 
-    return {id = note_id, title = string.gsub(title, "\r", "")}
+    return { id = note_id, title = string.gsub(title, "\r", "") }
 end
 
 local function extract_references(line, linenr)
@@ -37,7 +39,7 @@ local function extract_references(line, linenr)
     for ref in string.gmatch(line, "(%[%[" .. ZK_ID_PATTERN .. "%]%])") do
         ref = string.gsub(ref, "%[%[", "")
         ref = string.gsub(ref, "%]%]", "")
-        table.insert(references, {id = ref, linenr = linenr})
+        table.insert(references, { id = ref, linenr = linenr })
     end
 
     return references
@@ -59,7 +61,7 @@ local function extract_back_references(notes, note_id)
                     id = note.id,
                     title = note.title,
                     file_name = note.file_name,
-                    linenr = ref.linenr
+                    linenr = ref.linenr,
                 })
 
                 break
@@ -77,38 +79,45 @@ local function extract_tags(line, linenr)
 
     local tags = {}
     for tag in string.gmatch(line, "(%#%a[%w-]+)") do
-        table.insert(tags, {linenr = linenr, name = tag})
+        table.insert(tags, { linenr = linenr, name = tag })
     end
 
     return tags
 end
 
 local function get_note_information(file_path)
-    local last_modified = fn.strftime("%Y-%m-%d.%H:%M:%S",
-                                      fn.getftime(file_path))
-    if s_note_cache_with_file_path[file_path] ~= nil and
-        s_note_cache_with_file_path[file_path].last_modified == last_modified then
+    local last_modified = fn.strftime("%Y-%m-%d.%H:%M:%S", fn.getftime(file_path))
+    if
+        s_note_cache_with_file_path[file_path] ~= nil
+        and s_note_cache_with_file_path[file_path].last_modified == last_modified
+    then
         return s_note_cache_with_file_path[file_path]
     end
 
     local file = io.open(file_path, "r")
-    if file:read(0) == nil then return nil end
+    if file:read(0) == nil then
+        return nil
+    end
 
     local info = {
         file_name = file_path,
         last_modified = last_modified,
         tags = {},
         references = {},
-        back_references = {}
+        back_references = {},
     }
 
     local linenr = 0
     while true do
         linenr = linenr + 1
         local line = file:read("*line")
-        if line == nil then break end
+        if line == nil then
+            break
+        end
 
-        if line == "" then goto continue end
+        if line == "" then
+            goto continue
+        end
 
         if info.id == nil then
             local id_title = extract_id_and_title(line)
@@ -119,10 +128,14 @@ local function get_note_information(file_path)
         end
 
         local refs = extract_references(line, linenr)
-        if refs then vim.list_extend(info.references, refs) end
+        if refs then
+            vim.list_extend(info.references, refs)
+        end
 
         local tags = extract_tags(line, linenr)
-        if tags then vim.list_extend(info.tags, tags) end
+        if tags then
+            vim.list_extend(info.tags, tags)
+        end
 
         ::continue::
     end
@@ -133,11 +146,15 @@ local function get_note_information(file_path)
 end
 
 function M.get_note(id)
-    if s_note_cache_with_id[id] ~= nil then return s_note_cache_with_id[id] end
+    if s_note_cache_with_id[id] ~= nil then
+        return s_note_cache_with_id[id]
+    end
 
     local _ = M.get_notes()
 
-    if s_note_cache_with_id[id] ~= nil then return s_note_cache_with_id[id] end
+    if s_note_cache_with_id[id] ~= nil then
+        return s_note_cache_with_id[id]
+    end
 
     return nil
 end
@@ -151,7 +168,9 @@ function M.get_notes()
     end
 
     for _, note in ipairs(all_notes) do
-        if note.id == nil then goto continue end
+        if note.id == nil then
+            goto continue
+        end
 
         local back_references = extract_back_references(all_notes, note.id)
         if back_references then
@@ -171,13 +190,15 @@ function M.get_tags()
     local notes = M.get_notes()
     local tags = {}
     for _, note in ipairs(notes) do
-        if #note.tags == 0 then goto continue end
+        if #note.tags == 0 then
+            goto continue
+        end
 
         for _, tag in ipairs(note.tags) do
             table.insert(tags, {
                 linenr = tag.linenr,
                 name = tag.name,
-                file_name = note.file_name
+                file_name = note.file_name,
             })
         end
 
