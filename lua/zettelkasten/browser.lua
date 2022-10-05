@@ -155,7 +155,10 @@ function M.get_notes()
 
         local back_references = extract_back_references(all_notes, note.id)
         if back_references then
-            vim.list_extend(note.back_references, back_references)
+            -- When notes are cached, `back_references` field will have the references from before.
+            -- Since the files that refer to this one might have changed, we'll overwrite it here.
+            -- extract_back_references() already re-processes the references.
+            note.back_references = back_references
         end
 
         ::continue::
