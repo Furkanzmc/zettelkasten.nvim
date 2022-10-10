@@ -79,7 +79,11 @@ local function extract_tags(line, linenr)
 
     local tags = {}
     for tag in string.gmatch(line, "(%#%a[%w-]+)") do
-        table.insert(tags, { linenr = linenr, name = tag })
+        local start_pos, _ = string.find(line, tag, 1, true)
+        local previous_char = string.sub(line, start_pos - 1, start_pos - 1)
+        if previous_char == "" or previous_char == " " then
+            table.insert(tags, { linenr = linenr, name = tag })
+        end
     end
 
     return tags
