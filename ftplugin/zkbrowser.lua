@@ -37,19 +37,3 @@ local config = require("zettelkasten.config").get()
 if config.notes_path ~= "" then
     vim.cmd("lcd " .. config.notes_path)
 end
-
-vim.api.nvim_create_autocmd({ "BufEnter" }, {
-    group = vim.api.nvim_create_augroup("zettelkasten_browser_events", { clear = true }),
-    buffer = vim.api.nvim_get_current_buf(),
-    callback = function(opts)
-        vim.opt_local.syntax = ""
-        vim.api.nvim_buf_set_lines(
-            0,
-            vim.fn.line("$") - 1,
-            -1,
-            true,
-            require("zettelkasten").get_note_browser_content()
-        )
-        vim.opt_local.syntax = "zkbrowser"
-    end,
-})
