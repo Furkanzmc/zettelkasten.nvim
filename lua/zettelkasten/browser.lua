@@ -28,6 +28,9 @@ local function extract_id_and_title(line)
     zk_id = string.gsub(zk_id, "# ", "")
     local note_id = string.match(zk_id, ZK_ID_PATTERN)
     local title = vim.trim(string.gsub(zk_id, ZK_ID_PATTERN, ""))
+    if note_id == nil then
+        return nil
+    end
 
     return { id = note_id, title = string.gsub(title, "\r", "") }
 end
@@ -128,6 +131,8 @@ local function get_note_information(file_path)
             if id_title then
                 info = vim.tbl_extend("error", info, id_title)
                 goto continue
+            else
+                return nil
             end
         end
 
@@ -168,7 +173,12 @@ function M.get_notes()
     local files = get_files(folder)
     local all_notes = {}
     for _, file in ipairs(files) do
-        table.insert(all_notes, get_note_information(file))
+        local information = get_note_information(file)
+        if information then
+            table.insert(all_notes, information)
+        else
+            print(file .. " contains errors. Skipping...")
+        end
     end
 
     for _, note in ipairs(all_notes) do
