@@ -5,6 +5,7 @@ zettelkasten-[I	zettelkasten.txt	/*zettelkasten-[I*
 zettelkasten-about	zettelkasten.txt	/*zettelkasten-about*
 zettelkasten-commands	zettelkasten.txt	/*zettelkasten-commands*
 zettelkasten-completefunc	zettelkasten.txt	/*zettelkasten-completefunc*
+zettelkasten-get_all_tags	zettelkasten.txt	/*zettelkasten-get_all_tags*
 zettelkasten-get_back_references	zettelkasten.txt	/*zettelkasten-get_back_references*
 zettelkasten-get_toc	zettelkasten.txt	/*zettelkasten-get_toc*
 zettelkasten-keyword-expr	zettelkasten.txt	/*zettelkasten-keyword-expr*
@@ -15,6 +16,7 @@ zettelkasten-preview-notes	zettelkasten.txt	/*zettelkasten-preview-notes*
 zettelkasten-set-note-id	zettelkasten.txt	/*zettelkasten-set-note-id*
 zettelkasten-setup	zettelkasten.txt	/*zettelkasten-setup*
 zettelkasten-show_back_references	zettelkasten.txt	/*zettelkasten-show_back_references*
+zettelkasten-show_tags	zettelkasten.txt	/*zettelkasten-show_tags*
 zettelkasten-tagfunc	zettelkasten.txt	/*zettelkasten-tagfunc*
 zettelkasten.nvim	zettelkasten.txt	/*zettelkasten.nvim*
 zettelkasten.nvim-101	zettelkasten.txt	/*zettelkasten.nvim-101*

@@ -220,6 +220,23 @@ get_back_references({note_id})                 *zettelkasten-get_back_references
         - {title} (string): The title of the note with {id}
         - {file_name} (string): The file name of the note with {id}
 
+show_tags({cword}, {use_loclist})            *zettelkasten-show_tags*
+
+    Presents the list of notes that have the tag {cword}.
+    If {use_loclist} set to true, location list will be used instead of
+    quickfix list.
+
+get_all_tags({tag})                         *zettelkasten-get_all_tags*
+
+    Returns a list containg an item each describing a note that has {tag}.
+
+    Each item in the return table contains these values:
+
+        - {name} (string): The name of the tag.
+        - {linenr} (number): The line where the reference is found.
+        - {note_title} (string): The title of the note with the {tag}
+        - {file_name} (string): The file name of the note with the {tag}
+
 get_toc({note_id}, {format})                               *zettelkasten-get_toc*
 
     Returns a table that contains a list of notes that refer to {note_id}

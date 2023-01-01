@@ -227,6 +227,7 @@ function M.get_tags()
                 linenr = tag.linenr,
                 name = tag.name,
                 file_name = note.file_name,
+                note_title = note.title,
             })
         end
 

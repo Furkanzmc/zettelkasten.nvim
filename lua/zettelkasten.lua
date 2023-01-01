@@ -43,22 +43,6 @@ local function read_note(file_path, line_count)
     return lines
 end
 
-local function get_all_tags(lookup_tag)
-    if lookup_tag ~= nil and #lookup_tag > 0 then
-        lookup_tag = string.gsub(lookup_tag, "\\<", "")
-        lookup_tag = string.gsub(lookup_tag, "\\>", "")
-    end
-
-    local tags = browser.get_tags()
-    if lookup_tag ~= nil and #lookup_tag > 0 then
-        tags = vim.tbl_filter(function(tag)
-            return string.match(tag.name, lookup_tag) ~= nil
-        end, tags)
-    end
-
-    return tags
-end
-
 local function generate_note_id()
     return fn.strftime(NOTE_ID_STRFTIME_FORMAT)
 end
@@ -107,9 +91,9 @@ function M.tagfunc(pattern, flags, info)
     local pattern_provided = pattern ~= "\\<\\k\\k" or pattern == "*"
     local all_tags = {}
     if pattern_provided then
-        all_tags = get_all_tags(pattern)
+        all_tags = M.get_all_tags(pattern)
     else
-        all_tags = get_all_tags()
+        all_tags = M.get_all_tags()
     end
 
     local tags = {}
@@ -225,6 +209,58 @@ function M.show_back_references(cword, use_loclist)
         vim.api.nvim_get_current_buf(),
         use_loclist,
         { title = "[[" .. cword .. "]] References", lines = lines }
+    )
+
+    if use_loclist then
+        vim.cmd([[botright lopen | wincmd p]])
+    else
+        vim.cmd([[botright copen | wincmd p]])
+    end
+end
+
+function M.get_all_tags(lookup_tag)
+    if lookup_tag ~= nil and #lookup_tag > 0 then
+        lookup_tag = string.gsub(lookup_tag, "\\<", "")
+        lookup_tag = string.gsub(lookup_tag, "\\>", "")
+    end
+
+    local tags = browser.get_tags()
+    if lookup_tag ~= nil and #lookup_tag > 0 then
+        tags = vim.tbl_filter(function(tag)
+            return string.match(tag.name, lookup_tag) ~= nil
+        end, tags)
+    end
+
+    return tags
+end
+
+
+function M.show_tags(cword, use_loclist)
+    use_loclist = use_loclist or false
+    local tags = M.get_all_tags(cword)
+    if #tags == 0 then
+        log.notify("No tags found.", log_levels.ERROR, {})
+        return
+    end
+
+    local lines = {}
+    for _, tag in ipairs(tags) do
+        local line = {}
+        table.insert(line, fn.fnamemodify(tag.file_name, ":."))
+        table.insert(line, ":")
+        table.insert(line, tag.linenr)
+        table.insert(line, ": ")
+        table.insert(line, tag.note_title)
+
+        table.insert(lines, table.concat(line, ""))
+    end
+
+    set_qflist(
+        {},
+        " ",
+        vim.api.nvim_get_current_buf(),
+        use_loclist,
+        { title = "[[" .. cword .. "]] Tags", lines = lines }
     )
 
     if use_loclist then
