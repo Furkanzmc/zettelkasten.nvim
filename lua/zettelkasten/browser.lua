@@ -1,6 +1,8 @@
 local M = {}
 local fn = vim.fn
 
+local log_levels = vim.log.levels
+local log = require("zettelkasten.log")
 local config = require("zettelkasten.config")
 
 local s_note_cache_with_file_path = {}
@@ -15,15 +17,40 @@ local function get_files(folder, cfg)
     return files
 end
 
-local function extract_id_and_title(line, cfg)
+local function extract_id_and_title(line, file_path, cfg)
     local zk_id = string.match(line, cfg.title_pattern)
     if zk_id == nil then
         return nil
     end
 
+    local file_id = nil
+    if cfg.id_in_filename then
+        file_id = string.match(vim.fn.fnamemodify(file_path,':t:r'), cfg.id_pattern)
+    end
+
     zk_id = string.gsub(zk_id, "# ", "")
-    local note_id = string.match(zk_id, cfg.id_pattern)
-    local title = vim.trim(string.gsub(zk_id, cfg.id_pattern, ""))
+    local title_id = nil
+    local title = nil
+    if cfg.id_in_title then
+        title_id = string.match(zk_id, cfg.id_pattern)
+        title = vim.trim(string.gsub(zk_id, cfg.id_pattern, ""))
+    else
+        title = vim.trim(zk_id)
+    end
+
+    local note_id = nil
+    if cfg.id_in_filename and cfg.id_in_title then
+        if file_id ~= title_id then
+            log.notify('Filename id "'..file_id..'" and title id "'..title_id..'" did not match.', log_levels.ERROR, {})
+            return nil
+        else
+            note_id = file_id
+        end
+    elseif cfg.id_in_filename then
+        note_id = file_id
+    else
+        note_id = title_id
+    end
 
     return { id = note_id, title = string.gsub(title, "\r", "") }
 end
@@ -120,7 +147,7 @@ local function get_note_information(file_path, cfg)
         end
 
         if info.id == nil then
-            local id_title = extract_id_and_title(line, cfg)
+            local id_title = extract_id_and_title(line, file_path, cfg)
             if id_title then
                 info = vim.tbl_extend("error", info, id_title)
                 goto continue
