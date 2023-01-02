@@ -30,10 +30,10 @@ local function extract_id_and_title(
     local title = nil
     local note_id = nil
     zk_id = string.gsub(zk_id, "# ", "")
-    if id_inference_location == 0 then
+    if id_inference_location == config.TITLE then
         note_id = string.match(zk_id, id_pattern)
         title = vim.trim(string.gsub(zk_id, id_pattern, ""))
-    elseif id_inference_location == 1 then
+    elseif id_inference_location == config.FILENAME then
         note_id = string.match(vim.fn.fnamemodify(file_path, ":t:r"), id_pattern)
         title = vim.trim(zk_id)
     end
