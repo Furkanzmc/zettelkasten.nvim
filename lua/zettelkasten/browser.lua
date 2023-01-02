@@ -87,7 +87,7 @@ local function extract_tags(line, linenr)
     assert(line ~= nil)
 
     local tags = {}
-    for tag in string.gmatch(line, "(%#%a[%w-]+)") do
+    for tag in string.gmatch(line, "(%#%a[%w-_]+)") do
         local start_pos, _ = string.find(line, tag, 1, true)
         local previous_char = string.sub(line, start_pos - 1, start_pos - 1)
         if previous_char == "" or previous_char == " " then
