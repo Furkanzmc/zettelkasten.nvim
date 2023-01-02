@@ -2,11 +2,15 @@ local log_levels = vim.log.levels
 local log = require("zettelkasten.log")
 
 local M = {}
+
+M.TITLE = 0
+M.FILENAME = 1
+
 local s_config = {
     notes_path = "",
     preview_command = "pedit",
     browseformat = "%f - %h [%r Refs] [%b B-Refs] %t",
-    id_inference_location = 0,
+    id_inference_location = M.TITLE,
     id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+",
     filename_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md",
     title_pattern = "# %d+-%d+-%d+-%d+-%d+-%d+ .+",
@@ -24,6 +28,17 @@ M._set = function(new_config)
     end
 
     s_config = vim.tbl_extend("force", s_config, new_config)
+
+    if
+        s_config.id_inference_location ~= M.TITLE
+        and s_config.id_inference_location ~= M.FILENAME
+    then
+        log.notify(
+            "id_inference_location must be set to either TITLE or FILENAME.",
+            log_levels.WARN,
+            {}
+        )
+    end
 end
 
 return M
