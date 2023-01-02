@@ -147,12 +147,11 @@ setup({opts})                                                *zettelkasten-setup
             - {id_pattern} (optional, string): The regex pattern used to
               determine the id of a note.
               Default value is: `%d+-%d+-%d+-%d+-%d+-%d+`
-            - {id_in_filename} (optional, boolean): If true the note id is
-              extracted from the filename. (If the title is also used 
-              and the extracted ids differ, an error is raised.)
-            - {id_in_title} (optional, boolean): If true the note id is
-              extracted from the title. (If the filename is also used 
-              and the extracted ids differ, an error is raised.)
+            - {id_inference_location} (option, integer): A flag specifying
+              where the id of a note will inffered from. If this is set to 0
+              the the id is infered from the title of the note. If this is set
+              to 1 the id is infered from the filename of the note.
+              Default value is: 0
             - {filename_pattern} (optional, string): The regex pattern used to
               determine the if a file is a note.
               Default value is: `%d+-%d+-%d+-%d+-%d+-%d+.md`

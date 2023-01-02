@@ -1,65 +1,51 @@
 local M = {}
 local fn = vim.fn
 
-local log_levels = vim.log.levels
-local log = require("zettelkasten.log")
 local config = require("zettelkasten.config")
 
 local s_note_cache_with_file_path = {}
 local s_note_cache_with_id = {}
 
-local function get_files(folder, cfg)
+local function get_files(folder, filename_pattern)
     local files = fn.split(fn.globpath(folder, "*.md"), "\\n")
     files = vim.tbl_filter(function(file)
-        return string.match(file, cfg.filename_pattern) ~= nil
+        return string.match(file, filename_pattern) ~= nil
     end, files)
 
     return files
 end
 
-local function extract_id_and_title(line, file_path, cfg)
-    local zk_id = string.match(line, cfg.title_pattern)
+local function extract_id_and_title(
+    line,
+    file_path,
+    title_pattern,
+    id_pattern,
+    id_inference_location
+)
+    local zk_id = string.match(line, title_pattern)
     if zk_id == nil then
         return nil
     end
 
-    local file_id = nil
-    if cfg.id_in_filename then
-        file_id = string.match(vim.fn.fnamemodify(file_path,':t:r'), cfg.id_pattern)
-    end
-
-    zk_id = string.gsub(zk_id, "# ", "")
-    local title_id = nil
     local title = nil
-    if cfg.id_in_title then
-        title_id = string.match(zk_id, cfg.id_pattern)
-        title = vim.trim(string.gsub(zk_id, cfg.id_pattern, ""))
-    else
-        title = vim.trim(zk_id)
-    end
-
     local note_id = nil
-    if cfg.id_in_filename and cfg.id_in_title then
-        if file_id ~= title_id then
-            log.notify('Filename id "'..file_id..'" and title id "'..title_id..'" did not match.', log_levels.ERROR, {})
-            return nil
-        else
-            note_id = file_id
-        end
-    elseif cfg.id_in_filename then
-        note_id = file_id
-    else
-        note_id = title_id
+    zk_id = string.gsub(zk_id, "# ", "")
+    if id_inference_location == 0 then
+        note_id = string.match(zk_id, id_pattern)
+        title = vim.trim(string.gsub(zk_id, id_pattern, ""))
+    elseif id_inference_location == 1 then
+        note_id = string.match(vim.fn.fnamemodify(file_path, ":t:r"), id_pattern)
+        title = vim.trim(zk_id)
     end
 
     return { id = note_id, title = string.gsub(title, "\r", "") }
 end
 
-local function extract_references(line, linenr, cfg)
+local function extract_references(line, linenr, id_pattern)
     assert(line ~= nil)
 
     local references = {}
-    for ref in string.gmatch(line, "(%[%[" .. cfg.id_pattern .. "%]%])") do
+    for ref in string.gmatch(line, "(%[%[" .. id_pattern .. "%]%])") do
         ref = string.gsub(ref, "%[%[", "")
         ref = string.gsub(ref, "%]%]", "")
         table.insert(references, { id = ref, linenr = linenr })
@@ -101,7 +87,7 @@ local function extract_tags(line, linenr)
     assert(line ~= nil)
 
     local tags = {}
-    for tag in string.gmatch(line, "(%#%a[%w-]+)") do
+    for tag in string.gmatch(line, "(%#%a[%w-_]+)") do
         local start_pos, _ = string.find(line, tag, 1, true)
         local previous_char = string.sub(line, start_pos - 1, start_pos - 1)
         if previous_char == "" or previous_char == " " then
@@ -112,7 +98,8 @@ local function extract_tags(line, linenr)
     return tags
 end
 
-local function get_note_information(file_path, cfg)
+local function get_note_information(file_path, id_config)
+    id_config = id_config or { title_pattern = "", id_pattern = "", id_inference_location = -1 }
     local last_modified = fn.strftime("%Y-%m-%d.%H:%M:%S", fn.getftime(file_path))
     if
         s_note_cache_with_file_path[file_path] ~= nil
@@ -147,14 +134,20 @@ local function get_note_information(file_path, cfg)
         end
 
         if info.id == nil then
-            local id_title = extract_id_and_title(line, file_path, cfg)
+            local id_title = extract_id_and_title(
+                line,
+                file_path,
+                id_config.title_pattern,
+                id_config.id_pattern,
+                id_config.id_inference_location
+            )
             if id_title then
                 info = vim.tbl_extend("error", info, id_title)
                 goto continue
             end
         end
 
-        local refs = extract_references(line, linenr, cfg)
+        local refs = extract_references(line, linenr, id_config.id_pattern)
         if refs then
             vim.list_extend(info.references, refs)
         end
@@ -189,10 +182,17 @@ end
 function M.get_notes()
     local cfg = config.get()
     local folder = cfg.notes_path
-    local files = get_files(folder, cfg)
+    local files = get_files(folder, cfg.filename_pattern)
     local all_notes = {}
     for _, file in ipairs(files) do
-        table.insert(all_notes, get_note_information(file, cfg))
+        table.insert(
+            all_notes,
+            get_note_information(file, {
+                id_pattern = cfg.id_pattern,
+                title_pattern = cfg.title_pattern,
+                id_inference_location = cfg.id_inference_location,
+            })
+        )
     end
 
     for _, note in ipairs(all_notes) do
