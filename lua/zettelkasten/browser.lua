@@ -3,8 +3,6 @@ local fn = vim.fn
 
 local config = require("zettelkasten.config")
 
-local NOTE_ID_STRFTIME_FORMAT = "%Y-%m-%d-%H-%M-%S"
-
 local s_note_cache_with_file_path = {}
 local s_note_cache_with_id = {}
 
@@ -116,6 +114,7 @@ local function get_note_information(file_path, id_config)
     end
 
     local info = {
+        id = nil,
         file_name = file_path,
         last_modified = last_modified,
         tags = {},
@@ -238,10 +237,5 @@ function M.get_tags()
 
     return tags
 end
-
-M.generate_note_id = function (parent_name)
-    return fn.strftime(NOTE_ID_STRFTIME_FORMAT)
-end
-
 
 return M

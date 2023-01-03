@@ -86,10 +86,14 @@ COMMANDS                                                  *zettelkasten-commands
 
 Global ~
 
-ZkNew                                                                    *:ZkNew*
+ZkNew {parent_id}                                                        *:ZkNew* 
 
     Creates a new buffer with a markdown file type. If {notes_path} option was
     set with |zettelkasten-setup|, it'll change the working directory.
+
+    Parameters: ~
+        {parent_id} (optional, string): the parent id to use when choosing the
+        id for the new note. For further details see the {name_scheme} option.
 
 
 ZkHover {-preview} {-return-lines} {note_id}                           *:ZkHover*
@@ -149,10 +153,10 @@ setup({opts})                                                *zettelkasten-setup
               Default value is: `%d+-%d+-%d+-%d+-%d+-%d+`
             - {id_inference_location} (option, integer): A flag specifying
               where the id of a note will inffered from. If this is set to
-              zettelkasten.config.TITLE the the id is infered from the title of
-              the note. If this is set to zettelkasten.config.FILENAME the id is
+              `zettelkasten.config.TITLE` the the id is infered from the title of
+              the note. If this is set to `zettelkasten.config.FILENAME` the id is
               infered from the filename of the note. 
-              Default value is: zettelkasten.config.TITLE
+              Default value is: `zettelkasten.config.TITLE`
             - {filename_pattern} (optional, string): The regex pattern used to
               determine the if a file is a note.
               Default value is: `%d+-%d+-%d+-%d+-%d+-%d+.md`
@@ -162,6 +166,15 @@ setup({opts})                                                *zettelkasten-setup
             - {put_id_in_title} (optional, boolean): Whether to put the id in
               the note title when using :ZkNew and set_note_id().
               Default value is: true
+            - {name_scheme} (optional, integer): A flag specifying which
+              naming scheme to use. Currently the date and the Luhmann methods
+              are available. Using `zettelkasten.DATE` the id of a note will be 
+              the date and time it was created. Using `zettelkasten.LUHMANN`
+              the id of a a note is set to the next avalable id under the
+              given parent name. So if notes 1,2,2a,3 exist and the parent is
+              blank then the next id will be 4, if the parent is 1, it will be
+              1a and if the parent is 2 the id will be 2b.
+
 keyword_expr({cword}, {opts})                         *zettelkasten-keyword-expr*
 
     Returns a table that contains the context for the note with the given ID

@@ -7,7 +7,7 @@ local log = require("zettelkasten.log")
 local config = require("zettelkasten.config")
 local formatter = require("zettelkasten.formatter")
 local browser = require("zettelkasten.browser")
-
+local id = require("zettelkasten.id")
 
 local function set_qflist(lines, action, bufnr, use_loclist, what)
     what = what or {}
@@ -70,10 +70,16 @@ function M.completefunc(find_start, base)
 end
 
 function M.set_note_id(bufnr, parent_name)
-
     local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
-    local zk_id = browser.generate_note_id(parent_name)
-    if vim.fn.filereadable(zk_id..'.md') == 1 then
+    local notes = browser.get_notes()
+    local names = {}
+    for _, note in ipairs(notes) do
+        table.insert(names, note.id)
+    end
+
+    parent_name = parent_name or ""
+    local zk_id = id.generate_note_id(names, parent_name)
+    if vim.fn.filereadable(zk_id .. ".md") == 1 then
         log.notify("There's already a note with the same ID.", log_levels.ERROR, {})
     else
         if config.get().put_id_in_title then
@@ -289,8 +295,15 @@ function M.get_note_browser_content()
     end
 
     local all_notes = browser.get_notes()
-    local lines = {}
+    local names = {}
     for _, note in ipairs(all_notes) do
+        table.insert(names, note.id)
+    end
+    names = id.sort_ids(names) or {}
+
+    local lines = {}
+    for _, note_id in ipairs(names) do
+        local note = browser.get_note(note_id)
         table.insert(lines, {
             file_name = note.file_name,
             id = note.id,
