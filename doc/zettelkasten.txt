@@ -159,6 +159,9 @@ setup({opts})                                                *zettelkasten-setup
             - {title_pattern} (optional, string): The regex pattern used to
               determine the title of a note.
               Default value is: `# %d+-%d+-%d+-%d+-%d+-%d+ .+`
+            - {put_id_in_title} (optional, boolean): Whether to put the id in
+              the note title when using :ZkNew and set_note_id().
+              Default value is: true
 keyword_expr({cword}, {opts})                         *zettelkasten-keyword-expr*
 
     Returns a table that contains the context for the note with the given ID

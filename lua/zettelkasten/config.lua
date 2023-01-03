@@ -14,6 +14,7 @@ local s_config = {
     id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+",
     filename_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md",
     title_pattern = "# %d+-%d+-%d+-%d+-%d+-%d+ .+",
+    put_id_in_title = true,
 }
 
 M.get = function()
