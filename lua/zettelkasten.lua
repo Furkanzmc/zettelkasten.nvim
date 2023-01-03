@@ -234,7 +234,6 @@ function M.get_all_tags(lookup_tag)
     return tags
 end
 
-
 function M.show_tags(cword, use_loclist)
     use_loclist = use_loclist or false
     local tags = M.get_all_tags(cword)
@@ -338,6 +337,27 @@ function M._internal_execute_hover_cmd(args)
     if #lines > 0 then
         log.notify(table.concat(lines, "\n"), log_levels.INFO, {})
     end
+end
+
+function M.contains(filename)
+    local notes_path = config.get().notes_path
+    if notes_path == "" then
+        log.notify(
+            "'notes_path' option is required for checking note location.",
+            log_levels.WARN,
+            {}
+        )
+        return false
+    end
+    local file_path = vim.fn.resolve(vim.fs.normalize(filename))
+    notes_path = vim.fn.resolve(vim.fs.normalize(notes_path))
+
+    for dir in vim.fs.parents(file_path) do
+        if dir == notes_path then
+            return true
+        end
+    end
+    return false
 end
 
 function M.setup(opts)

@@ -183,6 +183,8 @@ tagfunc({pattern}, {flags}, {info})                        *zettelkasten-tagfunc
     Implements a |tagfunc|. This function is automatically set to the
     |tagfunc| option by the plugin.
 
+    This is also included as `v:lua.zettelkasten.tagfunc`
+
     Returns: ~
         {table}
 
@@ -198,6 +200,8 @@ completefunc({base})                                  *zettelkasten-completefunc
 
     Implements a |complete-function|. Given a {base} note ID or title, returns
     a list of notes matching notes.
+
+    This is also included as `v:lua.zettelkasten.completefunc`
 
     Parameters: ~
         {base} (string): Note ID or title.
@@ -274,6 +278,32 @@ get_toc({note_id}, {format})                               *zettelkasten-get_toc
             nargs = 1,
             range = true,
         })
+
+contains({path})                               *zettelkasten-is_in_notes_path*
+
+    Determines whether the given {path} is withing the directory structure
+    rooted at {notes_path}. 
+
+    This is also included as `v:lua.zettelkasten.contains`
+
+    Parameters: ~
+        {path} (string): The path to test for.
+
+    Returns: ~
+        {boolean}: `true` if {path} is within {notes_path} `false` otherwise.
+
+    Example: ~
+    When selectively setting options for the zettelkasten in the markdown
+    ftplugin: >
+
+    if v:lua.zettelkasten.contains(expand('%'))
+        setlocal tagfunc=v:lua.zettelkasten.tagfunc
+        setlocal isfname+=-,:
+        setlocal iskeyword+=:,-
+        setlocal suffixesadd+=.md
+        setlocal keywordprg=:ZkHover
+        setlocal completefunc=v:lua.zettelkasten.completefunc
+    endif
 
 ABOUT                                                        *zettelkasten-about*
 ================================================================================

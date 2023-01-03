@@ -43,4 +43,5 @@ _G.zettelkasten = {
     zkbrowse = function()
         vim.cmd("edit zk://browser")
     end,
+    contains = require("zettelkasten").contains,
 }
