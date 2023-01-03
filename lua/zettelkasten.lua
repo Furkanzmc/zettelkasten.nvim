@@ -8,7 +8,6 @@ local config = require("zettelkasten.config")
 local formatter = require("zettelkasten.formatter")
 local browser = require("zettelkasten.browser")
 
-local NOTE_ID_STRFTIME_FORMAT = "%Y-%m-%d-%H-%M-%S"
 
 local function set_qflist(lines, action, bufnr, use_loclist, what)
     what = what or {}
@@ -43,10 +42,6 @@ local function read_note(file_path, line_count)
     return lines
 end
 
-local function generate_note_id()
-    return fn.strftime(NOTE_ID_STRFTIME_FORMAT)
-end
-
 function M.completefunc(find_start, base)
     if find_start == 1 and base == "" then
         local pos = api.nvim_win_get_cursor(0)
@@ -74,9 +69,10 @@ function M.completefunc(find_start, base)
     return words
 end
 
-function M.set_note_id(bufnr)
+function M.set_note_id(bufnr, parent_name)
+
     local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
-    local zk_id = generate_note_id()
+    local zk_id = browser.generate_note_id(parent_name)
     if #zk_id > 0 then
         first_line, _ = string.gsub(first_line, "# ", "")
         api.nvim_buf_set_lines(bufnr, 0, 1, true, { "# " .. zk_id .. " " .. first_line })
