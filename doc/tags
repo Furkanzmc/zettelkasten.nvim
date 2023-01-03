@@ -16,7 +16,6 @@ zettelkasten-preview-notes	zettelkasten.txt	/*zettelkasten-preview-notes*
 zettelkasten-set-note-id	zettelkasten.txt	/*zettelkasten-set-note-id*
 zettelkasten-setup	zettelkasten.txt	/*zettelkasten-setup*
 zettelkasten-show_back_references	zettelkasten.txt	/*zettelkasten-show_back_references*
-zettelkasten-show_tags	zettelkasten.txt	/*zettelkasten-show_tags*
 zettelkasten-tagfunc	zettelkasten.txt	/*zettelkasten-tagfunc*
 zettelkasten.nvim	zettelkasten.txt	/*zettelkasten.nvim*
 zettelkasten.nvim-101	zettelkasten.txt	/*zettelkasten.nvim-101*

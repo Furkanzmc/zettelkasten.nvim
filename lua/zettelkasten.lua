@@ -238,41 +238,6 @@ function M.get_all_tags(lookup_tag)
     return tags
 end
 
-function M.show_tags(cword, use_loclist)
-    use_loclist = use_loclist or false
-    local tags = M.get_all_tags(cword)
-    if #tags == 0 then
-        log.notify("No tags found.", log_levels.ERROR, {})
-        return
-    end
-
-    local lines = {}
-    for _, tag in ipairs(tags) do
-        local line = {}
-        table.insert(line, fn.fnamemodify(tag.file_name, ":."))
-        table.insert(line, ":")
-        table.insert(line, tag.linenr)
-        table.insert(line, ": ")
-        table.insert(line, tag.note_title)
-
-        table.insert(lines, table.concat(line, ""))
-    end
-
-    set_qflist(
-        {},
-        " ",
-        vim.api.nvim_get_current_buf(),
-        use_loclist,
-        { title = "[[" .. cword .. "]] Tags", lines = lines }
-    )
-
-    if use_loclist then
-        vim.cmd([[botright lopen | wincmd p]])
-    else
-        vim.cmd([[botright copen | wincmd p]])
-    end
-end
-
 function M.get_toc(note_id, format)
     format = format or "- [%h](%d)"
     local references = M.get_back_references(note_id)
