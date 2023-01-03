@@ -6,7 +6,7 @@ local M = {}
 M.TITLE = 0
 M.FILENAME = 1
 
-M.DATE = 0
+M.DATE_TIME = 0
 M.LUHMANN = 1
 
 local s_config = {
@@ -18,7 +18,7 @@ local s_config = {
     filename_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md",
     title_pattern = "# %d+-%d+-%d+-%d+-%d+-%d+ .+",
     put_id_in_title = true,
-    name_scheme = M.DATE,
+    name_scheme = M.DATE_TIME,
 }
 
 M.get = function()
