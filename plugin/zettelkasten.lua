@@ -29,7 +29,7 @@ vim.api.nvim_create_autocmd({ "BufReadCmd" }, {
 _G.zettelkasten = {
     tagfunc = require("zettelkasten").tagfunc,
     completefunc = require("zettelkasten").completefunc,
-    zknew = function(parent_name)
+    zknew = function(parent_id)
         vim.cmd([[new | setlocal filetype=markdown]])
         local config = s_config.get()
         if config.notes_path ~= "" then
@@ -37,7 +37,7 @@ _G.zettelkasten = {
         end
 
         vim.cmd("normal ggI# New Note")
-        require("zettelkasten").set_note_id(vim.api.nvim_get_current_buf(), parent_name)
+        require("zettelkasten").set_note_id(vim.api.nvim_get_current_buf(), parent_id)
         vim.cmd("normal $")
     end,
     zkbrowse = function()

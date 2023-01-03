@@ -5,21 +5,21 @@ local date = require("zettelkasten.id.date")
 
 local M = {}
 
-function M.sort_ids(names)
-    local name_scheme = config.get().name_scheme
-    if name_scheme == config.DATE_TIME then
-        return date.sort_ids(names)
-    elseif name_scheme == config.LUHMANN then
-        return luhmann.sort_ids(names)
+function M.sort_ids(ids)
+    local id_scheme = config.get().id_scheme
+    if id_scheme == config.DATE_TIME then
+        return date.sort_ids(ids)
+    elseif id_scheme == config.LUHMANN then
+        return luhmann.sort_ids(ids)
     end
 end
 
-function M.generate_note_id(names, parent_name)
-    local name_scheme = config.get().name_scheme
-    if name_scheme == config.DATE_TIME then
-        return date.generate_note_id(names, parent_name)
-    elseif name_scheme == config.LUHMANN then
-        return luhmann.generate_note_id(names, parent_name)
+function M.generate_note_id(ids, parent_id)
+    local id_scheme = config.get().id_scheme
+    if id_scheme == config.DATE_TIME then
+        return date.generate_note_id(ids, parent_id)
+    elseif id_scheme == config.LUHMANN then
+        return luhmann.generate_note_id(ids, parent_id)
     end
 end
 

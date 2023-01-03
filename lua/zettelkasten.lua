@@ -69,16 +69,16 @@ function M.completefunc(find_start, base)
     return words
 end
 
-function M.set_note_id(bufnr, parent_name)
+function M.set_note_id(bufnr, parent_id)
     local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
     local notes = browser.get_notes()
-    local names = {}
+    local ids = {}
     for _, note in ipairs(notes) do
-        table.insert(names, note.id)
+        table.insert(ids, note.id)
     end
 
-    parent_name = parent_name or ""
-    local zk_id = id.generate_note_id(names, parent_name)
+    parent_id = parent_id or ""
+    local zk_id = id.generate_note_id(ids, parent_id)
     if vim.fn.filereadable(zk_id .. ".md") == 1 then
         log.notify("There's already a note with the same ID.", log_levels.ERROR, {})
     else
@@ -260,14 +260,14 @@ function M.get_note_browser_content()
     end
 
     local all_notes = browser.get_notes()
-    local names = {}
+    local ids = {}
     for _, note in ipairs(all_notes) do
-        table.insert(names, note.id)
+        table.insert(ids, note.id)
     end
-    names = id.sort_ids(names) or {}
+    ids = id.sort_ids(ids) or {}
 
     local lines = {}
-    for _, note_id in ipairs(names) do
+    for _, note_id in ipairs(ids) do
         local note = browser.get_note(note_id)
         table.insert(lines, {
             file_name = note.file_name,

@@ -1,23 +1,23 @@
 local M = {}
 
-local function split_name(name)
-    name = string.gsub(name, "%..*", "")
+local function split_id(id)
+    id = string.gsub(id, "%..*", "")
     local parts = {}
     local i = 0
     local j = 0
     local k = 1
-    local len = string.len(name)
-    i, j = string.find(name, "%a+")
+    local len = string.len(id)
+    i, j = string.find(id, "%a+")
     while j ~= nil do
         if k <= i - 1 then
-            table.insert(parts, string.sub(name, k, i - 1))
+            table.insert(parts, string.sub(id, k, i - 1))
         end
-        table.insert(parts, string.sub(name, i, j))
+        table.insert(parts, string.sub(id, i, j))
         k = j + 1
-        i, j = string.find(name, "%a+", k)
+        i, j = string.find(id, "%a+", k)
     end
     if k <= len then
-        table.insert(parts, string.sub(name, k))
+        table.insert(parts, string.sub(id, k))
     end
     return parts
 end
@@ -68,13 +68,13 @@ local function compareParts(part1, part2)
     return 0
 end
 
-local function compare_name_parts(name1_parts, name2_parts)
-    local len1 = #name1_parts
-    local len2 = #name2_parts
+local function compare_id_parts(id1_parts, id2_parts)
+    local len1 = #id1_parts
+    local len2 = #id2_parts
     local len_min = math.min(len1, len2)
     local comp = 0
     for i = 1, len_min do
-        comp = compareParts(name1_parts[i], name2_parts[i])
+        comp = compareParts(id1_parts[i], id2_parts[i])
         if comp < 0 then
             return true
         elseif comp > 0 then
@@ -90,55 +90,55 @@ local function compare_name_parts(name1_parts, name2_parts)
     end
 end
 
-local function split_and_sort_names(names)
-    local name_parts = {}
-    for _, name in pairs(names) do
-        table.insert(name_parts, split_name(name))
+local function split_and_sort_ids(ids)
+    local id_parts = {}
+    for _, id in pairs(ids) do
+        table.insert(id_parts, split_id(id))
     end
-    table.sort(name_parts, compare_name_parts)
-    return name_parts
+    table.sort(id_parts, compare_id_parts)
+    return id_parts
 end
 
-local function find_next_name(split_names, name)
-    local name_parts = split_name(name)
-    local len = #name_parts
+local function find_next_id(split_ids, id)
+    local id_parts = split_id(id)
+    local len = #id_parts
 
-    if len == 0 or string.find(name_parts[len], "%a") ~= nil then
-        table.insert(name_parts, "1")
+    if len == 0 or string.find(id_parts[len], "%a") ~= nil then
+        table.insert(id_parts, "1")
     else
-        table.insert(name_parts, "a")
+        table.insert(id_parts, "a")
     end
 
-    for i = 1, #split_names do
-        local fparts = split_names[i]
+    for i = 1, #split_ids do
+        local fparts = split_ids[i]
         local lengths_match = #fparts >= len + 1
         local parts_match = true
         for j = 1, (len + 1) do
-            if fparts[j] ~= name_parts[j] then
+            if fparts[j] ~= id_parts[j] then
                 parts_match = false
                 break
             end
         end
-        if lengths_match and parts_match and fparts[len + 1] == name_parts[len + 1] then
-            name_parts[len + 1] = incPart(name_parts[len + 1])
+        if lengths_match and parts_match and fparts[len + 1] == id_parts[len + 1] then
+            id_parts[len + 1] = incPart(id_parts[len + 1])
         end
     end
 
-    return table.concat(name_parts, "")
+    return table.concat(id_parts, "")
 end
 
-function M.sort_ids(names)
-    local name_parts = split_and_sort_names(names)
-    local new_names = {}
-    for _, name in pairs(name_parts) do
-        table.insert(new_names, table.concat(name, ""))
+function M.sort_ids(ids)
+    local id_parts = split_and_sort_ids(ids)
+    local new_ids = {}
+    for _, id in pairs(id_parts) do
+        table.insert(new_ids, table.concat(id, ""))
     end
-    return new_names
+    return new_ids
 end
 
-function M.generate_note_id(names, parent_name)
-    local split_names = split_and_sort_names(names)
-    return find_next_name(split_names, parent_name)
+function M.generate_note_id(ids, parent_id)
+    local split_ids = split_and_sort_ids(ids)
+    return find_next_id(split_ids, parent_id)
 end
 
 function M.test()
@@ -156,8 +156,8 @@ function M.test()
 
     print("Begin parse incs")
 
-    print("Begin names")
-    local names = {
+    print("Begin ids")
+    local ids = {
         "bb",
         "ba",
         "b",
@@ -175,22 +175,22 @@ function M.test()
         "1a2",
         "1a1",
     }
-    print(vim.inspect(names))
+    print(vim.inspect(ids))
 
     print("Begin sort")
-    local sorted_names = M.sort_ids(names)
+    local sorted_ids = M.sort_ids(ids)
 
-    print(vim.inspect(sorted_names))
+    print(vim.inspect(sorted_ids))
 
-    print("Begin next name")
-    sorted_names = { "1", "2", "3a", "3b", "3c", "4a1", "4a2", "4a3" }
-    print(assert(M.generate_note_id(sorted_names, ""), "5"))
-    print(assert(M.generate_note_id(sorted_names, "1"), "1a"))
-    print(assert(M.generate_note_id(sorted_names, "1a"), "1a1"))
-    print(assert(M.generate_note_id(sorted_names, "3"), "3d"))
-    print(assert(M.generate_note_id(sorted_names, "4"), "4b"))
-    print(assert(M.generate_note_id(sorted_names, "4a"), "4a4"))
-    print(assert(M.generate_note_id(sorted_names, "4a1"), "4a1a"))
+    print("Begin next id")
+    sorted_ids = { "1", "2", "3a", "3b", "3c", "4a1", "4a2", "4a3" }
+    print(assert(M.generate_note_id(sorted_ids, ""), "5"))
+    print(assert(M.generate_note_id(sorted_ids, "1"), "1a"))
+    print(assert(M.generate_note_id(sorted_ids, "1a"), "1a1"))
+    print(assert(M.generate_note_id(sorted_ids, "3"), "3d"))
+    print(assert(M.generate_note_id(sorted_ids, "4"), "4b"))
+    print(assert(M.generate_note_id(sorted_ids, "4a"), "4a4"))
+    print(assert(M.generate_note_id(sorted_ids, "4a1"), "4a1a"))
 end
 
 return M
