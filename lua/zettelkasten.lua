@@ -73,12 +73,12 @@ function M.set_note_id(bufnr, parent_name)
 
     local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
     local zk_id = browser.generate_note_id(parent_name)
-    if #zk_id > 0 then
+    if vim.fn.filereadable(zk_id..'.md') == 1 then
+        log.notify("There's already a note with the same ID.", log_levels.ERROR, {})
+    else
         first_line, _ = string.gsub(first_line, "# ", "")
         api.nvim_buf_set_lines(bufnr, 0, 1, true, { "# " .. zk_id .. " " .. first_line })
         vim.cmd("file " .. zk_id .. ".md")
-    else
-        log.notify("There's already a note with the same ID.", log_levels.ERROR, {})
     end
 end
 
