@@ -1,7 +1,7 @@
 local M = {}
 
-local function splitName(name)
-    name = string.gsub(name, "%..*","")
+local function split_name(name)
+    name = string.gsub(name, "%..*", "")
     local parts = {}
     local i = 0
     local j = 0
@@ -68,7 +68,7 @@ local function compareParts(part1, part2)
     return 0
 end
 
-local function compareNameParts(name1_parts, name2_parts)
+local function compare_name_parts(name1_parts, name2_parts)
     local len1 = #name1_parts
     local len2 = #name2_parts
     local len_min = math.min(len1, len2)
@@ -90,18 +90,17 @@ local function compareNameParts(name1_parts, name2_parts)
     end
 end
 
-local function splitAndSortNames(names)
+local function split_and_sort_names(names)
     local name_parts = {}
     for _, name in pairs(names) do
-        table.insert(name_parts, splitName(name))
+        table.insert(name_parts, split_name(name))
     end
-    table.sort(name_parts, compareNameParts)
+    table.sort(name_parts, compare_name_parts)
     return name_parts
 end
 
-local function findNextName(split_names, name)
-
-    local name_parts = splitName(name)
+local function find_next_name(split_names, name)
+    local name_parts = split_name(name)
     local len = #name_parts
 
     if len == 0 or string.find(name_parts[len], "%a") ~= nil then
@@ -129,7 +128,7 @@ local function findNextName(split_names, name)
 end
 
 function M.sort_ids(names)
-    local name_parts = splitAndSortNames(names)
+    local name_parts = split_and_sort_names(names)
     local new_names = {}
     for _, name in pairs(name_parts) do
         table.insert(new_names, table.concat(name, ""))
@@ -138,19 +137,8 @@ function M.sort_ids(names)
 end
 
 function M.generate_note_id(names, parent_name)
-    local split_names = splitAndSortNames(names)
-    return findNextName(split_names, parent_name)
-end
-
-function M.newThoughtTemplate()
-    return {
-        "# <+title+>",
-        "",
-        "# sources",
-        "",
-        "# tags",
-        "",
-    }
+    local split_names = split_and_sort_names(names)
+    return find_next_name(split_names, parent_name)
 end
 
 function M.test()

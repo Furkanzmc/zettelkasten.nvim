@@ -9,7 +9,6 @@ M.FILENAME = 1
 M.DATE = 0
 M.LUHMANN = 1
 
-
 local s_config = {
     notes_path = "",
     preview_command = "pedit",
