@@ -27,17 +27,16 @@ local function read_note(file_path, line_count)
     assert(file:read(0) ~= nil)
 
     if line_count == nil then
-        return file:read("*all")
+        line_count = 0
     end
 
     local lines = {}
-    while #lines < line_count do
-        local line = file:read("*line")
-        if line == nil then
+    for line in io.lines(file_path) do
+        line, _ = string.gsub(line, "\r", "")
+        table.insert(lines, line)
+        if line_count > 0 and #lines == line_count then
             break
         end
-
-        table.insert(lines, line)
     end
 
     return lines
