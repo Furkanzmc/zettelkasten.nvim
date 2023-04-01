@@ -8,8 +8,6 @@ local config = require("zettelkasten.config")
 local formatter = require("zettelkasten.formatter")
 local browser = require("zettelkasten.browser")
 
-local NOTE_ID_STRFTIME_FORMAT = "%Y-%m-%d-%H-%M-%S"
-
 local function set_qflist(lines, action, bufnr, use_loclist, what)
     what = what or {}
     local _, local_efm = pcall(vim.api.nvim_buf_get_option, bufnr, "errorformat")
@@ -58,8 +56,22 @@ local function get_all_tags(lookup_tag)
     return tags
 end
 
-local function generate_note_id()
-    return fn.strftime(NOTE_ID_STRFTIME_FORMAT)
+local function generate_note_id(parent_id)
+    local notes = browser.get_notes()
+
+    local id_format = config.get().id_format
+    local format_type = type(id_format)
+    if  format_type == 'string' then
+        return fn.strftime(id_format)
+    elseif  format_type == 'function' then
+        local ids = {}
+        for _, note in ipairs(notes) do
+            table.insert(ids, note.id)
+        end
+        return id_format(parent_id, ids)
+    else
+        log.notify("config.id_format is not a string or function.", log_levels.ERROR, {})
+    end
 end
 
 function M.completefunc(find_start, base)
@@ -89,9 +101,9 @@ function M.completefunc(find_start, base)
     return words
 end
 
-function M.set_note_id(bufnr)
+function M.set_note_id(bufnr, parent_id)
     local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
-    local zk_id = generate_note_id()
+    local zk_id = generate_note_id(parent_id)
     if #zk_id > 0 then
         first_line, _ = string.gsub(first_line, "# ", "")
         api.nvim_buf_set_lines(bufnr, 0, 1, true, { "# " .. zk_id .. " " .. first_line })
