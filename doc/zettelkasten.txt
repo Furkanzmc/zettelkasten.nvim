@@ -278,6 +278,22 @@ get_toc({note_id}, {format})                               *zettelkasten-get_toc
             range = true,
         })
 
+browser.get_note(id)                                      *zettelkasten-get_note*
+    
+    Returns the note information for the specified note, or `nil` if it does
+    not exist. >
+    note_info = require("zettelkasten").browser.get_note("1970-01-01-00-00-00")
+<
+
+browser.get_notes()                                      *zettelkasten-get_note*
+    
+    Returns the information of all the notes in the {notes_path}. >
+    notes = require("zettelkasten").browser.get_notes()
+    for _, note in ipairs(notes) do
+        print(note.id..': '..vim.inspect(note))
+    end
+<
+
 ABOUT                                                        *zettelkasten-about*
 ================================================================================
 
