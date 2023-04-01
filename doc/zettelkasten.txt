@@ -278,6 +278,32 @@ get_toc({note_id}, {format})                               *zettelkasten-get_toc
             range = true,
         })
 
+contains({path})                               *zettelkasten-is_in_notes_path*
+
+    Determines whether the given {path} is withing the directory structure
+    rooted at {notes_path}. 
+
+    This is also included as `v:lua.zettelkasten.contains`
+
+    Parameters: ~
+        {path} (string): The path to test for.
+
+    Returns: ~
+        {boolean}: `true` if {path} is within {notes_path} `false` otherwise.
+
+    Example: ~
+    When selectively setting options for the zettelkasten in the markdown
+    ftplugin: >
+
+    if v:lua.zettelkasten.contains(expand('%'))
+        setlocal tagfunc=v:lua.zettelkasten.tagfunc
+        setlocal isfname+=-,:
+        setlocal iskeyword+=:,-
+        setlocal suffixesadd+=.md
+        setlocal keywordprg=:ZkHover
+        setlocal completefunc=v:lua.zettelkasten.completefunc
+    endif
+
 browser.get_note(id)                                      *zettelkasten-get_note*
     
     Returns the note information for the specified note, or `nil` if it does

@@ -6,7 +6,11 @@ zettelkasten-about	zettelkasten.txt	/*zettelkasten-about*
 zettelkasten-commands	zettelkasten.txt	/*zettelkasten-commands*
 zettelkasten-completefunc	zettelkasten.txt	/*zettelkasten-completefunc*
 zettelkasten-get_back_references	zettelkasten.txt	/*zettelkasten-get_back_references*
+zettelkasten-get_note	zettelkasten.txt	/*zettelkasten-get_note*
+zettelkasten-get_notes	zettelkasten.txt	/*zettelkasten-get_notes*
+zettelkasten-get_tags	zettelkasten.txt	/*zettelkasten-get_tags*
 zettelkasten-get_toc	zettelkasten.txt	/*zettelkasten-get_toc*
+zettelkasten-is_in_notes_path	zettelkasten.txt	/*zettelkasten-is_in_notes_path*
 zettelkasten-keyword-expr	zettelkasten.txt	/*zettelkasten-keyword-expr*
 zettelkasten-lua	zettelkasten.txt	/*zettelkasten-lua*
 zettelkasten-maps	zettelkasten.txt	/*zettelkasten-maps*

@@ -315,6 +315,27 @@ function M._internal_execute_hover_cmd(args)
     end
 end
 
+function M.contains(filename)
+    local notes_path = config.get().notes_path
+    if notes_path == "" then
+        log.notify(
+            "'notes_path' option is required for checking note location.",
+            log_levels.WARN,
+            {}
+        )
+        return false
+    end
+    local file_path = vim.fn.resolve(vim.fs.normalize(filename))
+    notes_path = vim.fn.resolve(vim.fs.normalize(notes_path))
+
+    for dir in vim.fs.parents(file_path) do
+        if dir == notes_path then
+            return true
+        end
+    end
+    return false
+end
+
 function M.setup(opts)
     opts = opts or {}
     opts.notes_path = opts.notes_path or ""
