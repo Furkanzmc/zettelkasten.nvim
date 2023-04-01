@@ -281,16 +281,40 @@ get_toc({note_id}, {format})                               *zettelkasten-get_toc
 browser.get_note(id)                                      *zettelkasten-get_note*
     
     Returns the note information for the specified note, or `nil` if it does
-    not exist. >
+    not exist. Note info is a table with the following fields:
+    file_name:       (string) The filename of the note.
+    last_modified:   (string) The `%Y-%m-%d.%H:%M:%S` formatted modified time
+                              of the file. This is used with caching to 
+                              determine whether to reparse the file.
+    tags:            (table)  The list of tags in the file.
+    references:      (table)  The list of notes this note references.
+    back_references: (table)  The list of notes that reference this note.
+
+    This function can be used as follows:
+    >
     note_info = require("zettelkasten").browser.get_note("1970-01-01-00-00-00")
 <
 
-browser.get_notes()                                      *zettelkasten-get_note*
+browser.get_notes()                                      *zettelkasten-get_notes*
     
     Returns the information of all the notes in the {notes_path}. >
     notes = require("zettelkasten").browser.get_notes()
     for _, note in ipairs(notes) do
         print(note.id..': '..vim.inspect(note))
+    end
+<
+
+browser.get_tags()                                        *zettelkasten-get_tags*
+    
+    Returns all the tags in all the notes. A tag has the following fields:
+    linenr:     (number) The line number the tag is on.
+    name:       (string) The tag itself.
+    file_name:  (string) The file the tag was found in.
+
+    This is used in the tag function, and can be used as: >
+    tags = require("zettelkasten").browser.get_tags()
+    for _, tag in ipairs(tags) do
+        print(tag.file_name..':'..str(tag.linenr)..' '..tag.name)
     end
 <
 
