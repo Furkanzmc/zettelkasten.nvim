@@ -280,7 +280,7 @@ get_toc({note_id}, {format})                               *zettelkasten-get_toc
 
 contains({path})                               *zettelkasten-is_in_notes_path*
 
-    Determines whether the given {path} is withing the directory structure
+    Determines whether the given {path} is within the directory structure
     rooted at {notes_path}. 
 
     This is also included as `v:lua.zettelkasten.contains`
