@@ -57,18 +57,12 @@ local function get_all_tags(lookup_tag)
 end
 
 local function generate_note_id(parent_id)
-    local notes = browser.get_notes()
-
     local id_format = config.get().id_format
     local format_type = type(id_format)
     if format_type == "string" then
         return fn.strftime(id_format)
     elseif format_type == "function" then
-        local ids = {}
-        for _, note in ipairs(notes) do
-            table.insert(ids, note.id)
-        end
-        return id_format(parent_id, ids)
+        return id_format(parent_id)
     else
         log.notify("config.id_format is not a string or function.", log_levels.ERROR, {})
     end
@@ -316,7 +310,6 @@ function M._internal_execute_hover_cmd(args)
 end
 
 function M.contains(filename)
-    print("Hello World")
     local notes_path = config.get().notes_path
     if notes_path == "" then
         log.notify(

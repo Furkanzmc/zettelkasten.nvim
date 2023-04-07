@@ -92,8 +92,12 @@ ZkNew {parent_id}                                                        *:ZkNew
     set with |zettelkasten-setup|, it'll change the working directory.
 
     Parameters: ~
-        {parent_id} (optional, string): the parent id to use when choosing the
-        id for the new note. For further details see the {id_scheme} option.
+        {parent_id} (optional, string): the parent id to use when generating the
+        id for the new note. By default this is not used because the default
+        id generation is based on the current time. However this value is
+        passed to the {id_format} function and can be used to inform the
+        generator function. An example of this is in Luhdmann's naming scheme
+        where a child note of '12c2' would be '12a2a'.
 
 
 ZkHover {-preview} {-return-lines} {note_id}                           *:ZkHover*
@@ -153,14 +157,18 @@ setup({opts})                                                *zettelkasten-setup
               Default value is: `%d+-%d+-%d+-%d+-%d+-%d+`
             - {id_format} (optional, string, function): The format to use for
               generating new ids. If this is a string it is passed into
-              strftime to extract the current time in the specified format.
-              If this is a function it takes in the parent id passed to ZkNew
-              and the list of all the note ids, and should return a new id.
+              strftime to extract the current time in the specified format. If
+              this is a function it takes in the {parent_id} passed to ZkNew,
+              and should return a new id. 
               For example: >
               {
-                'id_format': function(parent_id, ids)
+                'id_format': function(parent_id)
                     -- Add one to last id. 
-                    return tonumber(ids[#ids]+1)
+                    local id = -1
+                    for _, note in ipairs(browser.get_notes()) do
+                        id = math.max(note.id, id)
+                    end
+                    return tonumber(id+1)
                 end
               }
 <
