@@ -61,9 +61,9 @@ local function generate_note_id(parent_id)
 
     local id_format = config.get().id_format
     local format_type = type(id_format)
-    if  format_type == 'string' then
+    if format_type == "string" then
         return fn.strftime(id_format)
-    elseif  format_type == 'function' then
+    elseif format_type == "function" then
         local ids = {}
         for _, note in ipairs(notes) do
             table.insert(ids, note.id)
@@ -316,7 +316,7 @@ function M._internal_execute_hover_cmd(args)
 end
 
 function M.contains(filename)
-    print('Hello World')
+    print("Hello World")
     local notes_path = config.get().notes_path
     if notes_path == "" then
         log.notify(
