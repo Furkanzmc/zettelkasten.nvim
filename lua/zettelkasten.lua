@@ -316,6 +316,7 @@ function M._internal_execute_hover_cmd(args)
 end
 
 function M.contains(filename)
+    print('Hello World')
     local notes_path = config.get().notes_path
     if notes_path == "" then
         log.notify(

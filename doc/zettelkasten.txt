@@ -129,7 +129,7 @@ setup({opts})                                                *zettelkasten-setup
         {opts} (optional, table)
             - {notes_path} (optional, string): Defaults to an empty string. If
               provided, |:ZkNew| uses the notes path to set the working
-              directory. If this is not set. you need to make sure that your
+              directory. If this is not set. You need to make sure that your
               working directory is your notes directory. Otherwise some
               features may not work.
             - {preview_command} (optional, string): The command to use to
@@ -152,7 +152,7 @@ setup({opts})                                                *zettelkasten-setup
               determine the id of a note.
               Default value is: `%d+-%d+-%d+-%d+-%d+-%d+`
             - {id_format} (optional, string, function): The format to use for
-              generateing new ids. If this is a string it is passed into
+              generating new ids. If this is a string it is passed into
               strftime to extract the current time in the specified format.
               If this is a function it takes in the parent id passed to ZkNew
               and the list of all the note ids, and should return a new id.
@@ -166,10 +166,10 @@ setup({opts})                                                *zettelkasten-setup
 <
               Default value is: `%Y-%m-%d-%H-%M-%S`
             - {id_inference_location} (option, integer): A flag specifying
-              where the id of a note will inffered from. If this is set to
-              zettelkasten.config.TITLE the the id is infered from the title of
+              where the id of a note will inferred from. If this is set to
+              zettelkasten.config.TITLE the id is inferred from the title of
               the note. If this is set to zettelkasten.config.FILENAME the id is
-              infered from the filename of the note. 
+              inferred from the filename of the note. 
               Default value is: zettelkasten.config.TITLE
             - {filename_pattern} (optional, string): The regex pattern used to
               determine the if a file is a note.
@@ -295,7 +295,7 @@ contains({path})                               *zettelkasten-is_in_notes_path*
     When selectively setting options for the zettelkasten in the markdown
     ftplugin: >
 
-    if v:lua.zettelkasten.contains(expand('%'))
+    if v:lua.require('zettelkasten').contains(expand('%'))
         setlocal tagfunc=v:lua.zettelkasten.tagfunc
         setlocal isfname+=-,:
         setlocal iskeyword+=:,-
@@ -311,7 +311,7 @@ browser.get_note(id)                                      *zettelkasten-get_note
     file_name:       (string) The filename of the note.
     last_modified:   (string) The `%Y-%m-%d.%H:%M:%S` formatted modified time
                               of the file. This is used with caching to 
-                              determine whether to reparse the file.
+                              determine whether to re-parse the file.
     tags:            (table)  The list of tags in the file.
     references:      (table)  The list of notes this note references.
     back_references: (table)  The list of notes that reference this note.
