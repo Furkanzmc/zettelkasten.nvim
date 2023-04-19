@@ -12,6 +12,7 @@ local s_config = {
     browseformat = "%f - %h [%r Refs] [%b B-Refs] %t",
     id_inference_location = M.TITLE,
     id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+",
+    id_format = "%Y-%m-%d-%H-%M-%S",
     filename_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md",
     title_pattern = "# %d+-%d+-%d+-%d+-%d+-%d+ .+",
 }

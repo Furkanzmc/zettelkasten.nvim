@@ -8,8 +8,6 @@ local config = require("zettelkasten.config")
 local formatter = require("zettelkasten.formatter")
 local browser = require("zettelkasten.browser")
 
-local NOTE_ID_STRFTIME_FORMAT = "%Y-%m-%d-%H-%M-%S"
-
 local function set_qflist(lines, action, bufnr, use_loclist, what)
     what = what or {}
     local _, local_efm = pcall(vim.api.nvim_buf_get_option, bufnr, "errorformat")
@@ -58,8 +56,16 @@ local function get_all_tags(lookup_tag)
     return tags
 end
 
-local function generate_note_id()
-    return fn.strftime(NOTE_ID_STRFTIME_FORMAT)
+local function generate_note_id(parent_id)
+    local id_format = config.get().id_format
+    local format_type = type(id_format)
+    if format_type == "string" then
+        return fn.strftime(id_format)
+    elseif format_type == "function" then
+        return id_format(parent_id)
+    else
+        log.notify("config.id_format is not a string or function.", log_levels.ERROR, {})
+    end
 end
 
 function M.completefunc(find_start, base)
@@ -89,9 +95,9 @@ function M.completefunc(find_start, base)
     return words
 end
 
-function M.set_note_id(bufnr)
+function M.set_note_id(bufnr, parent_id)
     local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
-    local zk_id = generate_note_id()
+    local zk_id = generate_note_id(parent_id)
     if #zk_id > 0 then
         first_line, _ = string.gsub(first_line, "# ", "")
         api.nvim_buf_set_lines(bufnr, 0, 1, true, { "# " .. zk_id .. " " .. first_line })
@@ -301,6 +307,27 @@ function M._internal_execute_hover_cmd(args)
     if #lines > 0 then
         log.notify(table.concat(lines, "\n"), log_levels.INFO, {})
     end
+end
+
+function M.contains(filename)
+    local notes_path = config.get().notes_path
+    if notes_path == "" then
+        log.notify(
+            "'notes_path' option is required for checking note location.",
+            log_levels.WARN,
+            {}
+        )
+        return false
+    end
+    local file_path = vim.fn.resolve(vim.fs.normalize(filename))
+    notes_path = vim.fn.resolve(vim.fs.normalize(notes_path))
+
+    for dir in vim.fs.parents(file_path) do
+        if dir == notes_path then
+            return true
+        end
+    end
+    return false
 end
 
 function M.setup(opts)
