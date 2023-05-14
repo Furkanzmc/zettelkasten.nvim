@@ -8,6 +8,29 @@ local config = require("zettelkasten.config")
 local formatter = require("zettelkasten.formatter")
 local browser = require("zettelkasten.browser")
 
+local function _internal_execute_hover_cmd(args)
+    if args ~= nil and type(args) == "string" then
+        args = vim.split(args, " ", true)
+    else
+        args = {}
+    end
+
+    local cword = ""
+    if #args == 1 then
+        cword = fn.expand("<cword>")
+    else
+        cword = args[#args]
+    end
+
+    local lines = M.keyword_expr(cword, {
+        preview_note = vim.tbl_contains(args, "-preview"),
+        return_lines = vim.tbl_contains(args, "-return-lines"),
+    })
+    if #lines > 0 then
+        log.notify(table.concat(lines, "\n"), log_levels.INFO, {})
+    end
+end
+
 local function set_qflist(lines, action, bufnr, use_loclist, what)
     what = what or {}
     local _, local_efm = pcall(vim.api.nvim_buf_get_option, bufnr, "errorformat")
@@ -276,37 +299,14 @@ function M.get_note_browser_content()
     return formatter.format(lines, config.get().browseformat)
 end
 
-function M.add_hover_command()
+function M.add_hover_command(bufnr)
     if fn.exists(":ZkHover") == 2 then
         return
     end
 
-    vim.cmd(
-        [[command -buffer -nargs=1 ZkHover :lua require"zettelkasten"._internal_execute_hover_cmd(<q-args>)]]
-    )
-end
-
-function M._internal_execute_hover_cmd(args)
-    if args ~= nil and type(args) == "string" then
-        args = vim.split(args, " ", true)
-    else
-        args = {}
-    end
-
-    local cword = ""
-    if #args == 1 then
-        cword = fn.expand("<cword>")
-    else
-        cword = args[#args]
-    end
-
-    local lines = M.keyword_expr(cword, {
-        preview_note = vim.tbl_contains(args, "-preview"),
-        return_lines = vim.tbl_contains(args, "-return-lines"),
-    })
-    if #lines > 0 then
-        log.notify(table.concat(lines, "\n"), log_levels.INFO, {})
-    end
+    api.nvim_buf_create_user_command(bufnr, "ZkHover", function(opts)
+        _internal_execute_hover_cmd(opts.args)
+    end, { nargs = "?" })
 end
 
 function M.contains(filename)
