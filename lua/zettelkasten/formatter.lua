@@ -45,7 +45,7 @@ function M.format(lines, format)
             cmps = string.gsub(cmps, "%" .. modifier, s_formatters[modifier](line))
         end
 
-        table.insert(formatted_lines, cmps)
+        table.insert(formatted_lines, vim.trim(cmps))
     end
 
     return formatted_lines
