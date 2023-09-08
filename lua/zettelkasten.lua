@@ -281,6 +281,9 @@ function M.get_note_browser_content()
     if config.get().notes_path == "" then
         log.notify("'notes_path' option is required for note browsing.", log_levels.WARN, {})
         return {}
+    elseif fn.isdirectory(config.get().notes_path) == 0 then
+        log.notify("'notes_path' is not a valid directory.", log_levels.WARN, {})
+        return {}
     end
 
     local all_notes = browser.get_notes()
@@ -311,7 +314,7 @@ end
 
 function M.contains(filename)
     local notes_path = config.get().notes_path
-    if notes_path == "" then
+    if fn.isdirectory(notes_path) == 0 then
         log.notify(
             "'notes_path' option is required for checking note location.",
             log_levels.WARN,
@@ -319,6 +322,7 @@ function M.contains(filename)
         )
         return false
     end
+
     local file_path = vim.fn.resolve(vim.fs.normalize(filename))
     notes_path = vim.fn.resolve(vim.fs.normalize(notes_path))
 

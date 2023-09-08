@@ -182,6 +182,10 @@ end
 function M.get_notes()
     local cfg = config.get()
     local folder = cfg.notes_path
+    if fn.isdirectory(folder) == 0 then
+        return {}
+    end
+
     local files = get_files(folder, cfg.filename_pattern)
     local all_notes = {}
     for _, file in ipairs(files) do
