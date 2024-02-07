@@ -12,7 +12,7 @@ if fn.exists(":ZkNew") == 0 then
         vim.cmd("normal ggI# New Note")
         require("zettelkasten").set_note_id(api.nvim_get_current_buf(), opts.args)
         vim.cmd("normal $")
-    end, { nargs = "?" })
+    end, { nargs = "?", bar = true })
 end
 
 if fn.exists(":ZkBrowse") == 0 then
