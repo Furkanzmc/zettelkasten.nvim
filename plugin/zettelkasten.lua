@@ -18,7 +18,7 @@ end
 if fn.exists(":ZkBrowse") == 0 then
     api.nvim_create_user_command("ZkBrowse", function(opts)
         vim.cmd("edit zk://browser")
-    end, {})
+    end, { bar = true })
 end
 
 api.nvim_create_autocmd({ "BufReadCmd" }, {
