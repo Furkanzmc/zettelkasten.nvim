@@ -15,6 +15,12 @@ local function get_files(folder, filename_pattern)
     return files
 end
 
+--- @param line string
+--- @param file_path string
+--- @param title_pattern string
+--- @param id_pattern string
+--- @param id_inference_location number
+--- @return table
 local function extract_id_and_title(
     line,
     file_path,
@@ -22,20 +28,17 @@ local function extract_id_and_title(
     id_pattern,
     id_inference_location
 )
-    local zk_id = string.match(line, title_pattern)
-    if zk_id == nil then
-        return nil
-    end
-
     local title = nil
     local note_id = nil
-    zk_id = string.gsub(zk_id, "# ", "")
     if id_inference_location == config.TITLE then
+        local zk_id = string.match(line, title_pattern)
+        zk_id = string.gsub(zk_id, "# ", "")
+
         note_id = string.match(zk_id, id_pattern)
         title = vim.trim(string.gsub(zk_id, id_pattern, ""))
     elseif id_inference_location == config.FILENAME then
         note_id = string.match(vim.fn.fnamemodify(file_path, ":t:r"), id_pattern)
-        title = vim.trim(zk_id)
+        title = vim.trim(string.gsub(line, "# ", ""))
     end
 
     return { id = note_id, title = string.gsub(title, "\r", "") }
