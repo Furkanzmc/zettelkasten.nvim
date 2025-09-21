@@ -119,11 +119,13 @@ function M.completefunc(find_start, base)
 end
 
 function M.set_note_id(bufnr, parent_id)
-    local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
     local zk_id = generate_note_id(parent_id)
     if #zk_id > 0 then
-        first_line, _ = string.gsub(first_line, "# ", "")
-        api.nvim_buf_set_lines(bufnr, 0, 1, true, { "# " .. zk_id .. " " .. first_line })
+        if config.id_inference_location == config.TITLE then
+            local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, true)[1]
+            first_line, _ = string.gsub(first_line, "# ", "")
+            api.nvim_buf_set_lines(bufnr, 0, 1, true, { "# " .. zk_id .. " " .. first_line })
+        end
         vim.cmd("file " .. zk_id .. ".md")
     else
         log.notify("There's already a note with the same ID.", log_levels.ERROR, {})
