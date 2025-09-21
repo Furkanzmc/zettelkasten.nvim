@@ -133,7 +133,7 @@ local function get_note_information(file_path, id_config)
             goto continue
         end
 
-        if info.id == nil then
+        if info.id == nil and string.starts_with(line, "#") then
             local id_title = extract_id_and_title(
                 line,
                 file_path,
